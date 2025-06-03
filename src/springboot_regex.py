@@ -3,9 +3,16 @@ import re
 
 # regex search for spring boot packages
 def get_springboot_regex(text):
-    entity = re.search("@Entity", text)
-    repo = re.search("@Repository", text)
-    service = re.search("@Service", text)
-    controller = re.search("@RestController", text)
+    pattern = r"""
+            @                   # starts with '@'
+            (?P<annotation>     # capture annotation name
+                Entity |
+                Repository |
+                Service |
+                RestController
+            )
+            \b                  # word boundary to avoid partial matches
+        """
 
-    return entity, repo, service, controller
+    matches = re.finditer(pattern, text, re.VERBOSE)
+    return list(matches)
