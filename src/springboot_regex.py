@@ -1,6 +1,7 @@
 import re
 
 
+# regex search for spring boot packages
 def get_springboot_regex(text):
     entity = re.search("@Entity", text)
     repo = re.search("@Repository", text)

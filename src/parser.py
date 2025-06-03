@@ -2,6 +2,7 @@ import os
 from springboot_regex import get_springboot_regex
 
 
+# extract text of class using bracket stack
 def get_class_text(text, match_obj):
     start = match_obj.start()
 
@@ -18,6 +19,7 @@ def get_class_text(text, match_obj):
     return text[start:]
 
 
+# walk directory and get java package classes
 def print_files_in_dir_nested(directory):
     for root, _, files in os.walk(directory):
         for filename in files:
