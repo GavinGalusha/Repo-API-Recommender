@@ -26,7 +26,7 @@ def print_files_in_dir_nested(directory):
             if filename.endswith(".java"):
                 with open(os.path.join(root, filename)) as f:
                     text = f.read().strip()
-                    matches = get_springboot_regex(text)
+                    matches = get_springboot_regex(text, API_only=True)
                     for match in matches:
                         if not match:
                             continue
