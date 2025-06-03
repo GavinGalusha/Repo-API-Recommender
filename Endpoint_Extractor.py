@@ -88,6 +88,12 @@ def extract_endpoints_from_directory(directory):
                 all_endpoints.extend(endpoints)
     return all_endpoints
 
+
+
+
+
+
+
 if __name__ == '__main__':
     import argparse
 
