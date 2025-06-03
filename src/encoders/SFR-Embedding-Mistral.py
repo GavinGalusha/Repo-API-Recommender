@@ -14,6 +14,7 @@ def last_token_pool(last_hidden_states: Tensor,
         batch_size = last_hidden_states.shape[0]
         return last_hidden_states[torch.arange(batch_size, device=last_hidden_states.device), sequence_lengths]
 
+# No need to add instruction for retrieval documents
 passages = [
     "My girlfriend is from India",
     "India is where my girlfriend comes from",
@@ -21,18 +22,17 @@ passages = [
     "My dogs name is kevin"
 ]
 
-# Load model and tokenizer
-tokenizer = AutoTokenizer.from_pretrained('Linq-AI-Research/Linq-Embed-Mistral')
-model = AutoModel.from_pretrained('Linq-AI-Research/Linq-Embed-Mistral')
+# load model and tokenizer
+tokenizer = AutoTokenizer.from_pretrained('Salesforce/SFR-Embedding-Mistral')
+model = AutoModel.from_pretrained('Salesforce/SFR-Embedding-Mistral')
 
+# get the embeddings
 max_length = 4096
-input_texts = [*passages]
-# Tokenize the input texts
-batch_dict = tokenizer(input_texts, max_length=max_length, padding=True, truncation=True, return_tensors="pt")
+batch_dict = tokenizer(passages, max_length=max_length, padding=True, truncation=True, return_tensors="pt")
 outputs = model(**batch_dict)
 embeddings = last_token_pool(outputs.last_hidden_state, batch_dict['attention_mask'])
 
-# Normalize embeddings
+# normalize embeddings
 embeddings = F.normalize(embeddings, p=2, dim=1)
 scores1 = (embeddings[0] @ embeddings[1].T) * 100
 scores2 = (embeddings[0] @ embeddings[2].T) * 100
