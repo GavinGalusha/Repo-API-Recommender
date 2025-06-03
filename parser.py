@@ -1,4 +1,5 @@
 import os
+from springboot_regex import get_endpoint_regex
 
 
 def print_files_in_dir_nested(directory):
@@ -6,7 +7,10 @@ def print_files_in_dir_nested(directory):
         if filename.endswith(".java"):
             with open(os.path.join(directory, filename)) as f:
                 text = f.read().strip()
-                print(text)
+                c, r, u, d = get_endpoint_regex(text)
+                for x in [c,r,u,d]:
+                    if x:
+                        print(x)
             continue
         elif os.path.isdir(filename):
             print_files_in_dir_nested(filename)
