@@ -1,9 +1,0 @@
-[
-  {
-    "class": "WelcomeController",
-    "method": "helloWorld",
-    "http_method": "GET",
-    "path": "/",
-    "file": "Test_Repo/Simplest-Spring-Boot-Hello-World/src/main/java/example/smallest/controllers/WelcomeController.java"
-  }
-]
