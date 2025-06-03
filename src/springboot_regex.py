@@ -1,10 +1,10 @@
 import re
 
 
-def get_endpoint_regex(text):
-    creates = re.search("@PostMapping", text)
-    reads = re.search("@GetMapping", text)
-    updates = re.search("@PutMapping", text)
-    deletes = re.search("@DeleteMapping", text)
+def get_springboot_regex(text):
+    entity = re.search("@Entity", text)
+    repo = re.search("@Repository", text)
+    service = re.search("@Service", text)
+    controller = re.search("@RestController", text)
 
-    return creates, reads, updates, deletes
+    return entity, repo, service, controller
