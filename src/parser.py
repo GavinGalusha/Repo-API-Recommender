@@ -1,41 +1,59 @@
 import os
-from springboot_regex import get_springboot_regex
+import re
 
 
-# extract text of class using bracket stack
-def get_class_text(text, match_obj):
-    start = match_obj.start()
+valid_extensions = ['.py', '.java', '.js', '.ts', '.go', '.rb', '.php', '.cs']
 
-    i = match_obj.end()
-    brace_count = 0
-    while i < len(text):
-        if text[i] == '{':
-            brace_count += 1
-        elif text[i] == '}':
-            brace_count -= 1
-            if brace_count == 0:
-                return text[start:i+1]
-        i += 1
-    return text[start:]
+endpoint_regex = [
+    # literals
+    r'["\'](/(?:api|v\d+)[^"\']*)["\']',
 
+    # java spring
+    r'@(?:Get|Post|Put|Delete|Patch)Mapping\s*\(\s*["\']([^"\']+)["\']',
 
-# walk directory and get java package classes
-def print_files_in_dir_nested(directory):
+    # express.js
+    r'\b(?:app|router)\.(?:get|post|put|delete|patch)\s*\(\s*["\']([^"\']+)["\']',
+
+    # fastapi/flask
+    r'\b(?:path|route)\s*\(\s*["\']([^"\']+)["\']',
+
+    # raw http
+    r'\b(?:GET|POST|PUT|DELETE|PATCH)\s+["\']?(/[^"\']+)["\']?'
+]
+
+def get_code(directory):
     for root, _, files in os.walk(directory):
-        for filename in files:
-            if filename.endswith(".java"):
-                with open(os.path.join(root, filename)) as f:
-                    text = f.read().strip()
-                    matches = get_springboot_regex(text, API_only=True)
-                    for match in matches:
-                        if not match:
-                            continue
-                        class_block = get_class_text(text, match)
-                        print(class_block)
-                continue
+        for file in files:
+            if any(file.endswith(ext) for ext in valid_extensions):
+                yield os.path.join(root, file)
+
+def get_endpoints(text):
+    endpoints = set()
+    for pattern in endpoint_regex:
+        matches = re.findall(pattern, text, flags=re.IGNORECASE)
+        for match in matches:
+            if isinstance(match, tuple):
+                endpoints.add(match[-1])
             else:
-                continue
+                endpoints.add(match)
+    return endpoints
+
+def parse(root_directory):
+    endpoints = set()
+    for path in get_code(root_directory):
+        try:
+            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                text = f.read()
+            cur_endpoints = get_endpoints(text)
+            endpoints.update(cur_endpoints)
+        except Exception as e:
+            print(e)
+    return endpoints
 
 
-cwd = os.getcwd()
-print_files_in_dir_nested(cwd)
+if __name__ == '__main__':
+    endpoints = parse('cloned')
+    with open('output.txt', 'w+') as f:
+        for endpoint in endpoints:
+            f.write(endpoint)
+            #print(endpoint)
