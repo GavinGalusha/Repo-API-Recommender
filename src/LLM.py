@@ -1,41 +1,24 @@
-from openai import OpenAI
-from dotenv import load_dotenv
-import os
+import lmstudio as lms
+SERVER_API_HOST = "localhost:1234"
 
-load_dotenv()
-client = OpenAI()
+# This must be the *first* convenience API interaction (otherwise the SDK
+# implicitly creates a client that accesses the default server API host)
+lms.configure_default_client(SERVER_API_HOST)
 
-
-
-
+model = lms.llm("ibm/granite-3.1-8b")
 
 
-def describe_java_api(api_code: str) -> str:
-    response = client.chat.completions.create(
-    model="gpt-4",
-    messages=[
-        {
-            "role": "system",
-            "content": (
-                "You are an expert software engineer who explains Java REST API code to developers. "
-                "Your job is to read API method implementations and summarize their behavior clearly and concisely. "
-                "Include what HTTP method is used, what the endpoint path is (if known), what data it returns, "
-                "and any notable implementation or response behavior. If it's a controller class, mention that too."
-            )
-        },
-        {
-            "role": "user",
-            "content": (
-                "Please explain what this Java Spring REST API code is doing in simple, descriptive language:\n\n"
-                f"{java_code}\n\n"
-                "Include: the HTTP method, content type, response body, and controller purpose."
-            )
-        }
-    ],
-    temperature=0.3
-)
+def describe_api(api_code):
+    result = model.respond("Give clear and concise description of what the following apis do. These natural language descriptions will be used to generate embeddings, so focus on meaning and purpose, not implementation details. The output should be in a similar format to this: The provided code snippet represents a RESTful controller in Java using Spring Framework, specifically designed to handle HTTP GET requests. The purpose of this controller is to generate an HTTP response with the message 'Hello FUCKING World!!!' when accessed via a GET request. In terms of API functionality, it's essentially a simple 'hello world' service that returns a string in JSON format. It doesn't accept any input parameters and does not interact with a database or other external resources. Its main role is to demonstrate the basic structure of a Spring-based web application and serve as an entry point for further development. The @RestController annotation marks this class as a controller that handles HTTP requests and returns coherent responses, usually in JSON format. The @RequestMapping(method = RequestMethod.GET) specifies that this controller should handle GET requests, while the produces parameter ('application/json') indicates that it will return data in JSON format. Finally, the helloWorld() method is annotated with @ResponseBody to instruct Spring to directly place the returned string into the response body of the HTTP response" + api_code)
+    return result
 
-    return response.choices[0].message.content
+
+
+
+
+
+
+
 
 
 
@@ -52,5 +35,5 @@ public class WelcomeController {
 """
 
 
-description = describe_java_api(java_code)
+description = describe_api(java_code)
 print(description)
