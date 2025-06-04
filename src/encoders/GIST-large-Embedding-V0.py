@@ -18,3 +18,7 @@ embeddings = model.encode(texts, convert_to_tensor=True)
 scores = F.cosine_similarity(embeddings.unsqueeze(1), embeddings.unsqueeze(0), dim=-1)
 
 print(scores.cpu().numpy())
+
+
+def get_gist_embedding(text):
+    return model.encode(text, convert_to_tensor=True)

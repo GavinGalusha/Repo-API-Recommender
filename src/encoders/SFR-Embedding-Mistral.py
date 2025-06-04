@@ -41,3 +41,7 @@ scores3 = (embeddings[2] @ embeddings[3].T) * 100
 print(scores1.tolist())
 print(scores2.tolist())
 print(scores3.tolist())
+
+
+def get_sfr_embedding(text):
+    return model.encode(text, convert_to_tensor=True)
