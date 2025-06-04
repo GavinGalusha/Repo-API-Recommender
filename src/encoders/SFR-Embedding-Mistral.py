@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 from transformers import AutoTokenizer, AutoModel
+import json
 
 
 def last_token_pool(last_hidden_states: Tensor,
@@ -45,3 +46,22 @@ print(scores3.tolist())
 
 def get_sfr_embedding(text):
     return model.encode(text, convert_to_tensor=True)
+
+def get_list_from_json(json_file):
+    api_explanations = []
+    with open(json_file, 'r') as file:
+        data = json.load(file)
+        for item in data:
+            api_explanations.append(item["description"])
+    return api_explanations
+
+
+def find_similar_apis(text):
+    embeddings = get_sfr_embedding(text)
+    scores = F.cosine_similarity(embeddings.unsqueeze(1), embeddings.unsqueeze(0), dim=-1)
+    return scores.cpu().numpy()
+
+
+print(get_sfr_embedding("hello world"))
+
+

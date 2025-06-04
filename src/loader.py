@@ -13,3 +13,4 @@ for url in urls:
     repo_local = f'cloned/{name}'
     if not os.path.exists(repo_local):
         subprocess.run(['git', 'clone', url, repo_local])
+
