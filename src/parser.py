@@ -1,6 +1,5 @@
 import os
 import json
-import re
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
@@ -14,9 +13,11 @@ model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map="auto", torc
 model.eval()
 
 
+# check file extension
 def is_code_file(filename):
     return any(filename.endswith(ext) for ext in CODE_EXTENSIONS)
 
+# create prompt for llm
 def build_prompt(code_str):
     return f"""<s>[INST] You are a code understanding assistant.
 
@@ -41,6 +42,7 @@ Here is the file:
 """
 
 
+# run the model with generated prompt
 def run_model(prompt, max_tokens=1024):
     inputs = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
     with torch.no_grad():
@@ -48,12 +50,12 @@ def run_model(prompt, max_tokens=1024):
             inputs,
             max_new_tokens=max_tokens,
             do_sample=False,
-            #temperature=0.0,
             pad_token_id=tokenizer.eos_token_id,
         ) 
     generated_ids = output[0][inputs.shape[-1]:]
     return tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
 
+# extract the json string from an LLM response
 def extract_json_string(s):
     print(s)
     json_start = s.find('{')
@@ -75,15 +77,12 @@ def main():
 
                         prompt = build_prompt(code)
                         response = run_model(prompt)
-                        trimmed = response#[len(prompt):]
 
-                        if "ENDPOINTS" in trimmed or "There are no REST API endpoints" in trimmed:
-                            print('nope')
-                            print(trimmed)
-                            pass#print(trimmed)
+                        if "ENDPOINTS" in response or "There are no REST API endpoints" in response:
+                            print(response)
                         else:
                             try:
-                                j = extract_json_string(trimmed)
+                                j = extract_json_string(response)
                                 print(j)
                                 json_obj = json.loads(j)
                                 out_file.write(json.dumps({
