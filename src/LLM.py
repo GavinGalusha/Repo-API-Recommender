@@ -1,4 +1,9 @@
 import lmstudio as lms
+from encoders.GIST_large_Embedding_V0 import get_gist_embedding
+from encoders.Linq_Embed_Mistral import get_linq_embedding  
+from encoders.SFR_Embedding_Mistral import get_sfr_embedding
+
+
 SERVER_API_HOST = "localhost:1234"
 
 # This must be the *first* convenience API interaction (otherwise the SDK
@@ -13,27 +18,10 @@ def describe_api(api_code):
     return result
 
 
+def build_Natural_Language_Description_Library(text_file):
+    with open(text_file, 'r') as file:
+        text = file.read()
+
+    return
 
 
-
-
-
-
-
-
-
-# example java code to test the function    
-java_code = """
-@RestController
-public class WelcomeController {
-
-    @RequestMapping(method = RequestMethod.GET, produces = {"application/json"})
-    public @ResponseBody String helloWorld() {
-        return "Hello FUCKING World!!!";
-    }
-}
-"""
-
-
-description = describe_api(java_code)
-print(description)
