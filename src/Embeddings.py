@@ -3,6 +3,7 @@ import json
 import torch
 import torch.nn.functional as F
 
+
 # Configuration
 API_URL = "http://localhost:1234/v1/embeddings"
 MODEL_NAME = "text-embedding-nomic-embed-text-v1.5-embedding"  
@@ -11,23 +12,20 @@ def get_embedding(text):
     payload = {
         "model": MODEL_NAME,
         "input": text
-    }  
+    }
     response = requests.post(
         API_URL,
         headers={"Content-Type": "application/json"},
         data=json.dumps(payload)
-    )   
+    )
     if response.status_code == 200:
         embedding = response.json()["data"][0]["embedding"]
-        print("✅ Embedding (first 10 values):", embedding[:10])
+        print("Embedding (first 10 values):", embedding[:10])
         return embedding
     else:
-        print("❌ Error:", response.status_code)
-        print(response.text)     
-        return None       
-
-
-
+        print("Error:", response.status_code)
+        print(response.text)
+        return None
 
 def get_embeddings_from_json(json_file):
     embeddings = []
@@ -38,13 +36,11 @@ def get_embeddings_from_json(json_file):
             embeddings.append(embedding)
     return embeddings
 
-
-
 def find_similar_apis(text, embeddings, descriptions, top_k=5):
     embedding = get_embedding(text)
     if embedding is None:
         return []
-    
+
     embedding_tensor = torch.tensor(embedding).unsqueeze(0)  # Shape: [1, D]
     embeddings_tensor = torch.tensor(embeddings)  # Shape: [N, D]
 
@@ -60,16 +56,4 @@ def find_similar_apis(text, embeddings, descriptions, top_k=5):
 
     return results
 
-
-
-
-
-
 test_embedding = get_embedding("get embeddings for this text")
-# Create request payload
-
-
-
-
-
-
