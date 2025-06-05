@@ -25,4 +25,3 @@ def build_Natural_Language_Description_Library(text_file):
     return
 
 
-

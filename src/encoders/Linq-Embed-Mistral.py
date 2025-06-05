@@ -44,23 +44,37 @@ print(scores2.tolist())
 print(scores3.tolist())
 
 
-def get_linq_embedding(text):
-    return model.encode(text, convert_to_tensor=True)
+def get_Linq_embedding(text: str) -> Tensor:
+    # Tokenize input
+    encoded_input = tokenizer(
+        text,
+        max_length=4096,
+        padding=True,
+        truncation=True,
+        return_tensors="pt"
+    )
+    # Pass through model
+    with torch.no_grad():
+        model_output = model(**encoded_input)
+    # Extract pooled embedding
+    pooled_embedding = last_token_pool(model_output.last_hidden_state, encoded_input["attention_mask"])
+    # Normalize the embedding
+    normalized_embedding = F.normalize(pooled_embedding, p=2, dim=1)
+    return normalized_embedding.squeeze(0)  # Remove batch dimension
 
 
-def get_list_from_json(json_file):
-    api_explanations = []
-    with open(json_file, 'r') as file:
-        data = json.load(file)
-        for item in data:
-            api_explanations.append(item["description"])
-    return api_explanations
+
+def find_similar_apis(text, reference_embeddings, description_list, top_k=5):
+    query_embedding = get_Linq_embedding(text)  # Shape: [dim]
+    # Stack existing embeddings into a single tensor
+    # Compute cosine similarity with all reference embeddings
+    scores = F.cosine_similarity(query_embedding.unsqueeze(0), reference_embeddings, dim=1)  # Shape: [N]
+    # Get top-k most similar indices
+    top_k_indices = torch.topk(scores, k=min(top_k, len(scores))).indices
+    # Return top-k (description, score) pairs
+    return [(description_list[i], scores[i].item()) for i in top_k_indices]
 
 
 
-def find_similar_apis(text):
-    embeddings = get_linq_embedding(text)
-    scores = F.cosine_similarity(embeddings.unsqueeze(1), embeddings.unsqueeze(0), dim=-1)
-    return scores.cpu().numpy()
-
-
+most_similar = find_similar_apis("dogs and cats", embeddings, passages)
+print(most_similar)
