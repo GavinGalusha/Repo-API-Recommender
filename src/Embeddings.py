@@ -7,8 +7,6 @@ import torch.nn.functional as F
 API_URL = "http://localhost:1234/v1/embeddings"
 MODEL_NAME = "text-embedding-nomic-embed-text-v1.5-embedding"  
 
-TEXT_TO_EMBED = "Some text to embed" 
-
 def get_embedding(text):
     payload = {
         "model": MODEL_NAME,
@@ -67,8 +65,10 @@ def find_similar_apis(text, embeddings, descriptions, top_k=5):
 
 
 
-
+test_embedding = get_embedding("get embeddings for this text")
 # Create request payload
+
+
 
 
 

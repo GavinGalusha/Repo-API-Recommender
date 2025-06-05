@@ -1,43 +1,37 @@
-import torch.nn.functional as F
 from sentence_transformers import SentenceTransformer
-import json
-revision = None
+import torch
+import torch.nn.functional as F
+from torch import Tensor
 
+# Load GIST model
+revision = None
 model = SentenceTransformer("avsolatorio/GIST-large-Embedding-v0", revision=revision)
 
-texts = [
-        "My girlfriend lived in Kerala",
-        "Kerala is the city where my girlfriend lived",
-        "My dog is named Kevin"
+def get_GIST_embedding(text: str) -> Tensor:
+    embedding = model.encode(text, convert_to_tensor=True)  # Already normalized
+    return embedding  # Shape: [dim]
+
+def find_similar_apis(text, reference_embeddings, description_list, top_k=5):
+    query_embedding = get_GIST_embedding(text)  # Shape: [dim]
+
+    # Compute cosine similarity with all reference embeddings
+    scores = F.cosine_similarity(query_embedding.unsqueeze(0), reference_embeddings, dim=1)  # Shape: [N]
+
+    # Get top-k most similar indices
+    top_k_indices = torch.topk(scores, k=min(top_k, len(scores))).indices
+
+    return [(description_list[i], scores[i].item()) for i in top_k_indices]
+
+# Example usage
+passages = [
+    "My girlfriend lived in Kerala",
+    "Kerala is the city where my girlfriend lived",
+    "My dog is named Kevin"
 ]
 
-# Compute embeddings
-embeddings = model.encode(texts, convert_to_tensor=True)
+# Precompute embeddings
+embeddings = model.encode(passages, convert_to_tensor=True)
 
-# Compute cosine-similarity for each pair of sentences
-scores = F.cosine_similarity(embeddings.unsqueeze(1), embeddings.unsqueeze(0), dim=-1)
-
-print(scores.cpu().numpy())
-
-
-# Get embedding for a given text
-def get_gist_embedding(text):
-    return model.encode(text, convert_to_tensor=True)
-
-
-
-# Get list of api explanations from json file
-def get_list_from_json(json_file):
-    api_explanations = []
-    with open(json_file, 'r') as file:
-        data = json.load(file)
-        for item in data:
-            api_explanations.append(item["description"])
-    return api_explanations
-
-
-# Find similar apis for a given text
-def find_similar_apis(text):
-    embeddings = get_gist_embedding(text)
-    scores = F.cosine_similarity(embeddings.unsqueeze(1), embeddings.unsqueeze(0), dim=-1)
-    return scores.cpu().numpy()
+# Run similarity
+most_similar = find_similar_apis("dogs and cats", embeddings, passages)
+print(most_similar)
