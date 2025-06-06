@@ -1,27 +1,102 @@
+import os
+import json
 import lmstudio as lms
-from encoders.GIST_large_Embedding_V0 import get_gist_embedding
-from encoders.Linq_Embed_Mistral import get_linq_embedding  
-from encoders.SFR_Embedding_Mistral import get_sfr_embedding
+import chromadb
 
-
+# Configuration
 SERVER_API_HOST = "localhost:1234"
+CODE_EXTENSIONS = {'.py', '.js', '.ts', '.java', '.go'}
+ROOT_DIR = "cloned"
+OUTPUT_FILE = "api_descriptions.json"
 
-# This must be the *first* convenience API interaction (otherwise the SDK
-# implicitly creates a client that accesses the default server API host)
+# Connect to the LLM server
+chroma_client = chromadb.Client()
+collection = chroma_client.get_or_create_collection(name="my_collection")
+
+
 lms.configure_default_client(SERVER_API_HOST)
-
 model = lms.llm("ibm/granite-3.1-8b")
 
 
-def describe_api(api_code):
-    result = model.respond("Give clear and concise description of what the following apis do. These natural language descriptions will be used to generate embeddings, so focus on meaning and purpose, not implementation details. The output should be in a similar format to this: The provided code snippet represents a RESTful controller in Java using Spring Framework, specifically designed to handle HTTP GET requests. The purpose of this controller is to generate an HTTP response with the message 'Hello FUCKING World!!!' when accessed via a GET request. In terms of API functionality, it's essentially a simple 'hello world' service that returns a string in JSON format. It doesn't accept any input parameters and does not interact with a database or other external resources. Its main role is to demonstrate the basic structure of a Spring-based web application and serve as an entry point for further development. The @RestController annotation marks this class as a controller that handles HTTP requests and returns coherent responses, usually in JSON format. The @RequestMapping(method = RequestMethod.GET) specifies that this controller should handle GET requests, while the produces parameter ('application/json') indicates that it will return data in JSON format. Finally, the helloWorld() method is annotated with @ResponseBody to instruct Spring to directly place the returned string into the response body of the HTTP response" + api_code)
-    return result
+documents = []
+# Check if file is code
+def is_code_file(filename):
+    return any(filename.endswith(ext) for ext in CODE_EXTENSIONS)
+
+# Construct prompt for the LLM
+def build_prompt(code_str):
+    return f"""<s>[INST] You are a code understanding assistant.
+
+Your job is to read a single source code file and determine if it defines any REST API endpoints.
+
+Instructions:
+- If this file explicitly defines one or more REST API endpoints (e.g., using a router, controller, or HTTP method annotation), respond with a JSON object describing the API defined in this file.
+- Your response should include:
+  - "api_summary": a 3-sentence high-level description of what the API does
+  - "methods": a list of HTTP methods used (e.g., ["GET", "POST"])
+  - "paths": a list of URL paths (e.g., ["/users", "/users/{{id}}"])
+
+- If this file does **not** define any REST API endpoints explicitly (e.g., it only has imports, config, or helpers), respond with exactly:
+NO ENDPOINTS
+
+Respond with no other text.
+
+Here is the file:
+```python
+{code_str}
+``` [/INST]
+"""
+# Run the model with the generated prompt
+def run_model(prompt):
+    response = model.respond(prompt)
+    text = response.content
+    print("Text:" + text)
+    return text
+
+# Extract the JSON substring from the model's output
+def extract_json_string(response):
+    print(response)
+    json_start = response.find('{')
+    json_end = response.rfind('}') + 1
+    print(json_start, json_end)
+    if json_start == -1 or json_end == -1:
+        raise ValueError("No JSON object found in string.")
+    return response[json_start:json_end]
+
+def truncate_code(code):
+    return code[:9000]
+    
+# Main execution logic
+def main():
+    with open(OUTPUT_FILE, 'w') as out_file:
+        for root, _, files in os.walk(ROOT_DIR):
+            for file in files:
+                if is_code_file(file):
+                    filepath = os.path.join(root, file)
+                    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                        code = f.read()
+                    
+                    truncated_code = truncate_code(code)
+                    prompt = build_prompt(truncated_code)
+                    response = run_model(prompt)
+                    if "ENDPOINTS" in response or "There are no REST API endpoints" in response:
+                        print(f"[SKIP] {filepath} - No endpoints found")
+                    else:
+                        documents.append(response)
+                        
+
+    collection.upsert(
+    documents=documents,
+    )
 
 
-def build_Natural_Language_Description_Library(text_file):
-    with open(text_file, 'r') as file:
-        text = file.read()
+    results = collection.query(
+    query_texts=["This API endpoint connects with a database"],
+    n_results=5
+    )
 
-    return
+    print(results)
+                    
 
-
+if __name__ == "__main__":
+    main()
