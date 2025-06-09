@@ -1,6 +1,5 @@
 import os
 import json
-import re
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import torch
 
@@ -98,7 +97,6 @@ def main():
                         negative_match = any([x in response for x in negatives])
                         if negative_match:
                             n += 1
-                            pass
                         else:
                             try:
                                 j = extract_json_string(response)
