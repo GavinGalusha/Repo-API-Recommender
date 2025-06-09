@@ -37,26 +37,25 @@ print("Document Length:", len(documents))
 
 
 #Uncomment when we want to update database
-
+''' 
 collection.upsert(
     documents=documents,
     ids=ids,
     metadatas=metadatas
 )
 
-
+'''
 
 print("Database Created")
-
-
-
 input = str(input("enter an api, and we will return suggested apis \n"))
-print(input)
 
-results = collection.query(
+def find_similar_apis(text_input, top_k = 4):
+    results = collection.query(
     query_texts=[input],
-    n_results=2
-)
+    n_results=4
+    )
+    return results
+    
 
 
-print(results)
+print(find_similar_apis(input))
