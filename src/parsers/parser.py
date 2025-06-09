@@ -1,6 +1,5 @@
 import os
 import json
-import re
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import torch
 
@@ -62,7 +61,7 @@ def run_model(prompt, max_tokens=1024):
             max_new_tokens=max_tokens,
             do_sample=False,
             pad_token_id=tokenizer.eos_token_id,
-        ) 
+        )
     generated_ids = output[0][inputs.shape[-1]:]
     return tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
 
@@ -93,7 +92,6 @@ def main():
                         negative_match = any([x in response for x in negatives])
                         if negative_match:
                             n += 1
-                            pass
                         else:
                             try:
                                 j = extract_json_string(response)
