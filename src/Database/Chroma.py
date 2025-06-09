@@ -1,7 +1,7 @@
 import chromadb
 import json
 
-chroma_client = chromadb.Client()
+chroma_client = chromadb.PersistentClient(path="database.chroma")
 collection = chroma_client.get_or_create_collection(name="my_collection")
 
 documents = []
@@ -31,18 +31,32 @@ with open("../api_descriptions.json", "r") as f:
         })
 
 
-print("Document LEngth:", len(documents))
+print("Document Length:", len(documents))
 # Upsert into the Chroma collection
+
+
+
+#Uncomment when we want to update database
+
 collection.upsert(
     documents=documents,
     ids=ids,
     metadatas=metadatas
 )
 
-# Run a test query
+
+
+print("Database Created")
+
+
+
+input = str(input("enter an api, and we will return suggested apis \n"))
+print(input)
+
 results = collection.query(
-    query_texts=["This API endpoint connects with a database"],
+    query_texts=[input],
     n_results=2
 )
+
 
 print(results)
