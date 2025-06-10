@@ -35,7 +35,7 @@ def is_code_file(filename) -> bool:
     return any(filename.endswith(ext) for ext in CODE_EXTENSIONS)
 
 def build_prompt(code_str):
-    """Run llama-family model with generated prompt"""
+    """Generate prompt with parsed code"""
     return f"""<s>[INST] You are a code understanding assistant.
 
 Your job is to read a single source code file and determine if it defines any REST API endpoints.
