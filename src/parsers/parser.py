@@ -1,3 +1,11 @@
+"""
+Parse a directory (likely src/cloned) that contains microservice repos.
+Walk through all directories and check whether each file is a predefined
+language common to defining REST API endpoints. If it is, prompt an LLM
+to determine whether the file contains any explicit API endpoints. If the
+file does, we extract the LLM-generated JSON description of the API and
+store it for further processing.
+"""
 import os
 import json
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
@@ -16,19 +24,18 @@ ROOT_DIR = "cloned"
 OUTPUT_FILE = "api_descriptions.json"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map="auto", quantization_config=bnb_conf, torch_dtype=torch.float16)
+model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, \
+                                             device_map="auto", \
+                                             quantization_config=bnb_conf, \
+                                             torch_dtype=torch.float16)
 model.eval()
 
-
-def is_code_file(filename):
+def is_code_file(filename) -> bool:
+    """Return whether a filename ends with a predefined language extension"""
     return any(filename.endswith(ext) for ext in CODE_EXTENSIONS)
 
-# check file extension
-def is_code_file(filename):
-    return any(filename.endswith(ext) for ext in CODE_EXTENSIONS)
-
-# create prompt for llm
 def build_prompt(code_str):
+    """Run llama-family model with generated prompt"""
     return f"""<s>[INST] You are a code understanding assistant.
 
 Your job is to read a single source code file and determine if it defines any REST API endpoints.
@@ -44,7 +51,7 @@ Instructions:
 Here is the file:
 ```python
 {code_str}
-``` 
+```
 - If this file does **not** define any REST API endpoints explicitly (e.g., it only has imports, config, or helpers), respond with exactly:
 NO ENDPOINTS
 
@@ -52,8 +59,8 @@ Respond with no other text. Be sure that output for an endpoint finding is in th
 """
 
 
-# run the model with generated prompt
 def run_model(prompt, max_tokens=1024):
+    """Run llama-family model with generated prompt"""
     inputs = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
     with torch.no_grad():
         output = model.generate(
@@ -65,48 +72,60 @@ def run_model(prompt, max_tokens=1024):
     generated_ids = output[0][inputs.shape[-1]:]
     return tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
 
-# extract the json string from an LLM response
 def extract_json_string(s):
-    print(s)
+    """
+    Extract JSON from LLM response, assuming that the only JSON is
+    the REST API description
+    """
     json_start = s.find('{')
     json_end = s.rfind('}') + 1
     if json_start == -1 or json_end == -1:
         raise ValueError("No JSON object found in string.")
     return s[json_start:json_end]
 
+def has_negative_match(response) -> bool:
+    """
+    Return whether an LLM response contains commonly observed
+    negative responses to REST API detection
+    """
+    negatives = ['ENDPOINTS', 'There are no REST API endpoints', \
+                 'file does not contain REST', 'file does not contain any', \
+                 'file does not define any']
+    return any((r in response for r in negatives))
+
 def main():
     with open(OUTPUT_FILE, 'w') as out_file:
         p, n = 0, 0
         for root, _, files in os.walk(ROOT_DIR):
             for file in files:
-                if is_code_file(file):
-                    filepath = os.path.join(root, file)
-                    try:
-                        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-                            code = f.read()
+                if not is_code_file(file):
+                    continue
+                filepath = os.path.join(root, file)
+                try:
+                    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                        code = f.read()
 
-                        prompt = build_prompt(code)
-                        response = run_model(prompt)
+                    prompt = build_prompt(code)
+                    response = run_model(prompt)
+                    negative_match = has_negative_match(response)
 
-                        negatives = ['ENDPOINTS', 'There are no REST API endpoints', 'file does not contain REST', 'file does not contain any', 'file does not define any']
-                        negative_match = any([x in response for x in negatives])
-                        if negative_match:
-                            n += 1
-                        else:
-                            try:
-                                j = extract_json_string(response)
-                                json_obj = json.loads(j)
-                                out_file.write(json.dumps({
-                                    "file": filepath,
-                                    "endpoints": json_obj
-                                }) + '\n')
-                                out_file.flush()
-                                p += 1
-                                print(f'positives: {p}, negatives: {n}.')
-                            except json.JSONDecodeError:
-                                print(f"[WARN] Failed to parse JSON for {filepath}")
-                    except Exception as e:
-                        print(f"[ERROR] Failed to process {filepath}: {e}")
+                    if negative_match:
+                        n += 1
+                    else:
+                        try:
+                            j = extract_json_string(response)
+                            json_obj = json.loads(j)
+                            out_file.write(json.dumps({
+                                "file": filepath,
+                                "endpoints": json_obj
+                            }) + '\n')
+                            out_file.flush()
+                            p += 1
+                            print(f'positives: {p}, negatives: {n}.')
+                        except json.JSONDecodeError:
+                            print(f"[WARN] Failed to parse JSON for {filepath}")
+                except Exception as e:
+                    print(f"[ERROR] Failed to process {filepath}: {e}")
 
 if __name__ == "__main__":
     main()
