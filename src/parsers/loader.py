@@ -1,11 +1,17 @@
-import pandas as pd
+#!/usr/bin/env python3
+"""
+Read dataset csv file released in https://dl.acm.org/doi/10.1145/3643991.3644890
+and clone each repository. These are later used to parse REST API endpoints
+with LLMs.
+"""
+
 import csv
 import subprocess
 import os
+import pandas as pd
 
-
-fname = 'dataset.csv'
-x = pd.read_csv(fname, delimiter=';', quoting=csv.QUOTE_NONE)
+FNAME = 'dataset.csv'
+x = pd.read_csv(FNAME, delimiter=';', quoting=csv.QUOTE_NONE)
 
 urls = x['URL']
 for url in urls:
