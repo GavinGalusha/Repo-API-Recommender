@@ -8,7 +8,7 @@ import chromadb
 SERVER_API_HOST = "localhost:1234"
 # Connect to the LLM server
 
-chroma_client = chromadb.PersistentClient(path="Database/database.chroma")
+chroma_client = chromadb.PersistentClient(path="src/Database/database.chroma")
 collection = chroma_client.get_or_create_collection(name="my_collection")
 
 
@@ -37,16 +37,12 @@ def parse_rag_response(rag_response):
     return result
 
 
-
-
-
-
 lms.configure_default_client(SERVER_API_HOST)
 model = lms.llm("ibm/granite-3.1-8b")
 
 prompt = """ 
 
-is the input api. You are an api reccomender. Take in the descriptions of an API or multiple APIs, and for each api and file listed below, state the api and the file, and explain how a similar feature could be implemented using the input api. Do not include publically known api's we are talking about specific endpoints that are built in these applications"""
+is the input api. Your job is to recommend the apis that you receive below. Take in the descriptions of an API or multiple APIs, and for each api and file listed below, state the api and the file, and explain how a similar feature could be implemented based off the input api. Do not include publically known api's we are talking about specific endpoints that are built in these applications. Below are the reccomended api's: """
 
 input = input("Input an api description to receive similar api's that could be useful: \n")
 

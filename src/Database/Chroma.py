@@ -9,7 +9,7 @@ ids = []
 metadatas = []
 
 # Open the JSONL-style file (one JSON object per line)
-with open("API/sample_data/api_descriptions_deepseek_coder_6pt7b.json", "r") as f:
+with open("../../sample_data/api_descriptions_deepseek_coder_6pt7b.json", "r") as f:
     for i, line in enumerate(f):
         api = json.loads(line.strip())  # Parse each line as a JSON object
 
@@ -20,7 +20,7 @@ with open("API/sample_data/api_descriptions_deepseek_coder_6pt7b.json", "r") as 
         paths = str(endpoints.get("paths", "Empty"))
 
 
-        
+
         documents.append(summary)
         print()
         ids.append(f"id_{i}")
@@ -62,3 +62,4 @@ def find_similar_apis(text_input, top_k = 4):
 
 
 print(find_similar_apis())
+
