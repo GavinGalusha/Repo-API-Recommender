@@ -3,13 +3,23 @@ import json
 import lmstudio as lms
 import chromadb
 
-
-# Configuration
+''' #LMS studio method 
 SERVER_API_HOST = "localhost:1234"
-# Connect to the LLM server
 
+lms.configure_default_client(SERVER_API_HOST)
+model = lms.llm("ibm/granite-3.1-8b")
+'''
+
+#access database
 chroma_client = chromadb.PersistentClient(path="src/Database/database.chroma")
 collection = chroma_client.get_or_create_collection(name="my_collection")
+
+
+#transformers method
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-base")
+model = T5ForConditionalGeneration.from_pretrained("google/flan-t5-base")
+
 
 
 def find_similar_apis(text_input, top_k = 4):
@@ -37,8 +47,7 @@ def parse_rag_response(rag_response):
     return result
 
 
-lms.configure_default_client(SERVER_API_HOST)
-model = lms.llm("ibm/granite-3.1-8b")
+
 
 prompt = """ 
 
@@ -52,9 +61,21 @@ response = parse_rag_response(rag_response)
 
 print("Rag Response", response)
 print()
+
+input_text = input + prompt + str(response)
+input_ids = tokenizer(input_text, return_tensors="pt").input_ids
+
+outputs = model.generate(input_ids)
+print("final structured output:")
+print("Your input: ", input)
+print(tokenizer.decode(outputs[0]))
+
+
+
+#LMS way of doing it 
+''' 
 result = model.respond(input + prompt + str(response))
 print("final structured output:")
 print("Your input: ", input)
 print(result)
-
-
+'''
