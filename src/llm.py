@@ -1,31 +1,24 @@
-import os
-import json
-import lmstudio as lms
 import chromadb
-
-''' #LMS studio method 
-SERVER_API_HOST = "localhost:1234"
-
-lms.configure_default_client(SERVER_API_HOST)
-model = lms.llm("ibm/granite-3.1-8b")
-'''
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
 #access database
-chroma_client = chromadb.PersistentClient(path="database.chroma")
+chroma_client = chromadb.PersistentClient(path="/data/hamaraa/Repo-API-Recommender/src/Database/database.chroma")
 collection = chroma_client.get_or_create_collection(name="my_collection")
-
+print(collection.count())
 
 #transformers method
-from transformers import T5Tokenizer, T5ForConditionalGeneration
-tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-base")
-model = T5ForConditionalGeneration.from_pretrained("google/flan-t5-base")
-
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.2")
+model = AutoModelForCausalLM.from_pretrained(
+    "mistralai/Mistral-7B-Instruct-v0.2", torch_dtype=torch.float16, device_map=device
+)
  
-def find_similar_apis(text_input, top_k = 4):
+def find_similar_apis(text_input, top_k=4):
     results = collection.query(
-    query_texts=[input],
-    n_results=4
+    query_texts=[text_input],
+    n_results=top_k
     )
     return results
 
@@ -46,56 +39,44 @@ def parse_rag_response(rag_response):
 
     return result
 
-
-
-
 prompt = """
+You are an expert API assistant. Given an API feature description (called the INPUT API), and a list of similar internal APIs (called the RECOMMENDED APIs), your task is to analyze and structure useful implementation suggestions.
 
-The following is a technical description of an API feature (marked as the INPUT API). 
-Your task is to examine a list of similar internal API descriptions (RECOMMENDED APIs), 
-and for each recommended API, provide:
+For **each recommended API**, return output in the following format:
 
-1. The file path it came from.
-2. A brief summary of what that API does.
-3. A specific explanation of how the feature described in the INPUT API could be implemented using this recommended API, drawing clear parallels in functionality or design.
+---
+Path: <exact file path>
+Summary: <1-2 sentence description of the API>
+Implementation Guidance: <How this API can be used to implement the INPUT API feature. Use 4+ descriptive sentences. Reference specific methods, endpoints, or concepts.>
+---
 
-⚠️ Do NOT refer to publicly available APIs or services (e.g., Stripe, Twitter). Focus strictly on the private, internal APIs provided.
+Important rules:
+- DO NOT mention public services (e.g., Stripe, Twitter).
+- Focus only on the private, internal APIs listed in the RECOMMENDED APIs section.
+- Write clearly for a developer audience.
 
-Use at least **4 descriptive sentences** per recommendation, written for a developer audience.
+Now complete the following:
 
---- INPUT API ---
+### INPUT API
 {input_api}
 
---- RECOMMENDED APIs ---
+### RECOMMENDED APIs
 {recommended_apis}
 """
 
-input = input("Input an api description to receive similar api's that could be useful: \n")
-
-
-rag_response = find_similar_apis(input)
+user_input = input("Input an api description to receive similar api's that could be useful: \n")
+rag_response = find_similar_apis(user_input)
 response = parse_rag_response(rag_response)
 
 print("Rag Response", response)
-print()
 
 input_text = prompt.format(
-    input_api = input,
+    input_api = user_input,
     recommended_apis = str(response)
 )
-input_ids = tokenizer(input_text, return_tensors="pt").input_ids
+input_ids = tokenizer(input_text, return_tensors="pt").input_ids.to(model.device)
+print('generating model output...')
+outputs = model.generate(input_ids, max_new_tokens=1024)
 
-outputs = model.generate(input_ids, max_new_tokens=512)
 print("final structured output:")
-print("Your input: ", input)
-print(tokenizer.decode(outputs[0]))
-
-
-
-#LMS way of doing it 
-''' 
-result = model.respond(input + prompt + str(response))
-print("final structured output:")
-print("Your input: ", input)
-print(result)
-'''
+print(tokenizer.decode(outputs[0], skip_special_tokens=True))
