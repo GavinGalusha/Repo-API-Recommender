@@ -15,7 +15,7 @@ model = AutoModelForCausalLM.from_pretrained(
     "mistralai/Mistral-7B-Instruct-v0.2", torch_dtype=torch.float16, device_map=device
 )
  
-def find_similar_apis(text_input, top_k=4):
+def find_similar_apis(text_input, top_k=1):
     results = collection.query(
     query_texts=[text_input],
     n_results=top_k
@@ -39,44 +39,70 @@ def parse_rag_response(rag_response):
 
     return result
 
+def read_code(filename):
+    with open(filename, 'r') as f:
+        code = f.read()
+    return code
+
 prompt = """
-You are an expert API assistant. Given an API feature description (called the INPUT API), and a list of similar internal APIs (called the RECOMMENDED APIs), your task is to analyze and structure useful implementation suggestions.
+You are an expert software assistant. Given a developer's API feature request (called the INPUT API) and a list of RECOMMENDED APIs retrieved from an internal codebase, your job is to analyze the provided source code and suggest specific implementation guidance.
 
-For **each recommended API**, return output in the following format:
+For each recommended API, do the following:
+- Identify the FULL **file path**.
+- Summarize the **purpose** of the API using the filename and the code contents.
+- Explain how **specific code from the file** (methods, classes, endpoint routes, or logic) can be reused or adapted to help implement the INPUT API functionality.
+
+Each response should follow this exact format:
 
 ---
-Path: <exact file path>
-Summary: <1-2 sentence description of the API>
-Implementation Guidance: <How this API can be used to implement the INPUT API feature. Use 4+ descriptive sentences. Reference specific methods, endpoints, or concepts.>
+**Path:** <exact file path>  
+**Summary:** <brief summary of what the code does>  
+**Implementation Guidance:** <4+ descriptive sentences showing how specific parts of the code (by name or behavior) can help implement the INPUT API. Use concrete references to the code.>
 ---
 
-Important rules:
-- DO NOT mention public services (e.g., Stripe, Twitter).
-- Focus only on the private, internal APIs listed in the RECOMMENDED APIs section.
-- Write clearly for a developer audience.
+Rules:
+- DO NOT reference any public APIs or libraries (e.g., Stripe, Twitter).
+- Only use the code and descriptions provided in the recommended list.
+- Assume the reader is a software engineer familiar with REST, Python, and API patterns.
 
 Now complete the following:
 
-### INPUT API
+### INPUT API  
 {input_api}
 
-### RECOMMENDED APIs
+### RECOMMENDED APIs (with code excerpts)  
 {recommended_apis}
+
+<END OF CODE>
+** Ensure that you include code snippets from the recommended API code excerpts in your response. **
 """
 
 user_input = input("Input an api description to receive similar api's that could be useful: \n")
 rag_response = find_similar_apis(user_input)
-response = parse_rag_response(rag_response)
+rag_response = parse_rag_response(rag_response)
 
-print("Rag Response", response)
+response = [] 
+for path, summary in rag_response:
+    code = read_code(path)
+    response.append({
+        "path": path,
+        "summary": summary,
+        "code": code
+    })
+
+formatted_apis = ""
+for r in response:
+    formatted_apis += f"\n---\nPath: {r['path']}\nSummary: {r['summary']}\nCode:\n{r['code'][:1000]}\n"
 
 input_text = prompt.format(
     input_api = user_input,
-    recommended_apis = str(response)
+    recommended_apis = formatted_apis
 )
 input_ids = tokenizer(input_text, return_tensors="pt").input_ids.to(model.device)
 print('generating model output...')
 outputs = model.generate(input_ids, max_new_tokens=1024)
 
 print("final structured output:")
-print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+structured_output = tokenizer.decode(outputs[0], skip_special_tokens=True)
+with open('output.txt', 'w') as f:
+    f.write(structured_output)
