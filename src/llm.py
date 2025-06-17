@@ -11,7 +11,7 @@ model = lms.llm("ibm/granite-3.1-8b")
 '''
 
 #access database
-chroma_client = chromadb.PersistentClient(path="src/Database/database.chroma")
+chroma_client = chromadb.PersistentClient(path="database.chroma")
 collection = chroma_client.get_or_create_collection(name="my_collection")
 
 
@@ -21,7 +21,7 @@ tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-base")
 model = T5ForConditionalGeneration.from_pretrained("google/flan-t5-base")
 
 
-
+ 
 def find_similar_apis(text_input, top_k = 4):
     results = collection.query(
     query_texts=[input],
@@ -49,9 +49,26 @@ def parse_rag_response(rag_response):
 
 
 
-prompt = """ 
+prompt = """
 
-is the input api. Your job is to recommend the apis that you receive below. Take in the descriptions of an API or multiple APIs, and for each api and file listed below, state the api and the file, and explain how a similar feature could be implemented based off the input api. Do not include publically known api's we are talking about specific endpoints that are built in these applications. Below are the reccomended api's: """
+The following is a technical description of an API feature (marked as the INPUT API). 
+Your task is to examine a list of similar internal API descriptions (RECOMMENDED APIs), 
+and for each recommended API, provide:
+
+1. The file path it came from.
+2. A brief summary of what that API does.
+3. A specific explanation of how the feature described in the INPUT API could be implemented using this recommended API, drawing clear parallels in functionality or design.
+
+⚠️ Do NOT refer to publicly available APIs or services (e.g., Stripe, Twitter). Focus strictly on the private, internal APIs provided.
+
+Use at least **4 descriptive sentences** per recommendation, written for a developer audience.
+
+--- INPUT API ---
+{input_api}
+
+--- RECOMMENDED APIs ---
+{recommended_apis}
+"""
 
 input = input("Input an api description to receive similar api's that could be useful: \n")
 
@@ -62,10 +79,13 @@ response = parse_rag_response(rag_response)
 print("Rag Response", response)
 print()
 
-input_text = input + prompt + str(response)
+input_text = prompt.format(
+    input_api = input,
+    recommended_apis = str(response)
+)
 input_ids = tokenizer(input_text, return_tensors="pt").input_ids
 
-outputs = model.generate(input_ids)
+outputs = model.generate(input_ids, max_new_tokens=512)
 print("final structured output:")
 print("Your input: ", input)
 print(tokenizer.decode(outputs[0]))
