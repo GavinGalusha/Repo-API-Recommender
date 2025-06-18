@@ -107,10 +107,13 @@ def chain_of_retrieval(
         )
 
         with torch.no_grad():
-            in_ids = tokenizer(refine_prompt, return_tensors="pt").to(model.device)
-            out    = model.generate(**in_ids, max_new_tokens=32, temperature=0.2)
-        current_q = tokenizer.decode(out[0][in_ids.input_ids.shape[1]:],
+            input_ids = tokenizer(refine_prompt, return_tensors="pt").input_ids.to(model.device)
+            out = model.generate(**input_ids, max_new_tokens=32, temperature=0.2)
+        current_q = tokenizer.decode(out[0][input_ids.shape[1]:],
                                      skip_special_tokens=True).strip()
+        
+       
+   
 
     return aggregated
 
