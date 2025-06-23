@@ -1,0 +1,2 @@
+.env
+src/database.chroma/chroma.sqlite3
