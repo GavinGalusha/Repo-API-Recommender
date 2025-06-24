@@ -1,10 +1,10 @@
-import chromadb
 import json
+import chromadb
 import lmstudio as lms
 from pathlib import Path
 from chromadb.config import Settings
 
-''' 
+'''
 chroma_client = chromadb.PersistentClient(path="../database.chroma")
 collection1 = chroma_client.get_or_create_collection(name="my_collection")
 '''
@@ -15,16 +15,13 @@ conn = sqlite3.connect(DB_FILE)
 cursor = conn.cursor()
 print(cursor.execute("SELECT name FROM sqlite_master WHERE type='table';").fetchall())
 
-
 CHROMA_DIR = Path(__file__).resolve().parent.parent / "database.chroma"
 
 client = chromadb.PersistentClient(
     path=str(CHROMA_DIR),          # MUST be a directory, not the *.sqlite3 file
     settings=Settings(anonymized_telemetry=False)  # optional
 )
-collection = client.get_collection("my_collection") 
-
-
+collection = client.get_collection("my_collection")
 
 documents = []
 ids = []
@@ -33,9 +30,7 @@ metadatas = []
 
 model = lms.llm("ibm/granite-3.1-8b")
 
-
-
-''' 
+'''
 # Open the JSONL-style file (one JSON object per line)
 with open("../../sample_data/api_descriptions_deepseek_coder_6pt7b.json", "r") as f:
     for i, line in enumerate(f):
@@ -64,20 +59,14 @@ print("Document Length:", len(documents))
 # Upsert into the Chroma collection
 
 
-
 #Uncomment when we want to update database
 collection1.upsert(
     documents=documents,
     ids=ids,
     metadatas=metadatas
-)n
+)
 '''
-
-
 print("Database Created")
-
-
-
 
 
 def find_similar_apis(text_input, top_k):
@@ -89,8 +78,6 @@ def find_similar_apis(text_input, top_k):
     )
     print("Found similar apis")
     return results
-    
-
 
 def parse_rag_response(rag_response):
     """
@@ -145,19 +132,19 @@ api_descriptions = [
 
 
 
-prompt = prompt = """
+prompt = """
 You are a senior software engineer assistant. A developer has provided an API feature request (INPUT API), and your job is to review both internal APIs (RECOMMENDED INTERNAL APIs) and relevant open-source examples (OPTIONAL EXTERNAL APIs) to offer specific, implementation-level guidance.
 
 For each recommended API (internal or external), respond using this format:
 
 ---
-**Source:** <file path or GitHub URL>  
-**Summary:** <1–2 sentence summary of what the code does, based on filename and contents.>  
-**Implementation Guidance:**  
-- Explain how this code is related to the INPUT API functionality.  
-- Reference specific function names, classes, or logic.  
-- Avoid generic phrases — clearly map features from this code to possible components in the INPUT API.  
-- If external, suggest how this repo might be used as a reference only (not directly imported).  
+**Source:** <file path or GitHub URL>
+**Summary:** <1–2 sentence summary of what the code does, based on filename and contents.>
+**Implementation Guidance:**
+- Explain how this code is related to the INPUT API functionality.
+- Reference specific function names, classes, or logic.
+- Avoid generic phrases — clearly map features from this code to possible components in the INPUT API.
+- If external, suggest how this repo might be used as a reference only (not directly imported).
 ---
 
 **Rules:**
@@ -168,10 +155,10 @@ For each recommended API (internal or external), respond using this format:
 - Do not mention proprietary APIs (e.g., Stripe, Twitter).
 - Use only the provided materials.
 
-### INPUT API  
+### INPUT API
 {input_api}
 
-### RECOMMENDED INTERNAL APIs (with code excerpts)  
+### RECOMMENDED INTERNAL APIs (with code excerpts)
 {recommended_apis}
 
 
@@ -180,10 +167,7 @@ For each recommended API (internal or external), respond using this format:
 - Do **not** restate features (e.g., “this has user registration”); explain how they are implemented.
 """
 
-
-
 with open("Vanilla_Retreival.txt", "w") as output_file:
-    
     for i, api in enumerate(api_descriptions):
 
         recommended = find_similar_apis(api,1)
@@ -195,5 +179,3 @@ with open("Vanilla_Retreival.txt", "w") as output_file:
         response = model.respond(input_text)
         print(response)
         output_file.write(f'input api description #{i}: \n \n" {api} \n "recommended APIs:" {str(response)} \n')
-
-
