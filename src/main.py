@@ -44,11 +44,10 @@ if ensemble:
         "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO", torch_dtype=torch.float16, device_map="auto"
     )
 
-# get user input and query vector db
+# format RAG code and descriptions
 user_input = input("Input an API description: ")
 rag_response = find_similar_apis(collection=collection, text_input=user_input)
 parsed_rag_response = parse_rag_response(rag_response)
-
 internal_prompt_blocks = generate_internal_prompt_blocks(parsed_rag_response=parsed_rag_response)
 
 # include external repo if relevant
@@ -68,7 +67,6 @@ mistral_text = generate_text(model=mistral_model, tokenizer=mistral_tokenizer, i
 if not ensemble:
     with open("output.txt", "w") as f:
         f.write(mistral_text)
-    print("Output saved to output.txt.")
 else:
     # generate response with LLaMA
     llama_text = generate_text(model=llama_model, tokenizer=llama_tokenizer, input_text=final_input, max_new_tokens=2048)
@@ -80,4 +78,4 @@ else:
     # write output to output file
     with open("output.txt", "w") as f:
         f.write(final_response)
-    print("Output saved to output.txt.")
+print("Output saved to output.txt.")
