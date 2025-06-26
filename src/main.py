@@ -3,7 +3,10 @@ import chromadb
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
-from web_search import search_for_microservice
+from utils.web_search import search_for_microservice
+from utils.helpers import read_code
+from utils.helpers import find_similar_apis
+from utils.helpers import parse_rag_response
 
 # check ensemble argument
 parser = argparse.ArgumentParser()
@@ -37,22 +40,6 @@ if ensemble:
     merger_model = AutoModelForCausalLM.from_pretrained(
         "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO", torch_dtype=torch.float16, device_map="auto"
     )
-
-# retrieve local APIs
-def find_similar_apis(text_input, top_k=3):
-    results = collection.query(query_texts=[text_input], n_results=top_k)
-    return results
-
-# parse response from vector db
-def parse_rag_response(rag_response):
-    documents = rag_response['documents'][0]
-    metadatas = rag_response['metadatas'][0]
-    return [(meta.get('file', 'UNKNOWN FILE'), doc) for doc, meta in zip(documents, metadatas)]
-
-# read code file
-def read_code(filename):
-    with open(filename, 'r') as f:
-        return f.read()
 
 # summarization prompt (pass 1)
 summary_prompt = """
@@ -105,7 +92,7 @@ For each recommended API (internal or external), respond using this format:
 
 # get user input and query vector db
 user_input = input("Input an API description: ")
-rag_response = find_similar_apis(user_input)
+rag_response = find_similar_apis(collection=collection, text_input=user_input)
 rag = parse_rag_response(rag_response)
 
 # summarize and format internal APIs
