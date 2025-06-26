@@ -16,7 +16,7 @@ tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.2")
 model = AutoModelForCausalLM.from_pretrained(
     "mistralai/Mistral-7B-Instruct-v0.2", torch_dtype=torch.float16, device_map=device
 )
- 
+
 def find_similar_apis(text_input, top_k=1):
     results = collection.query(
     query_texts=[text_input],
@@ -185,7 +185,7 @@ rag_response = parse_rag_response(rag_response)
 rag_response = chain_of_retrieval(user_input)
 
 
-response = [] 
+response = []
 for path, summary in rag_response:
     code = read_code(path)
     response.append({
