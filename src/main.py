@@ -7,6 +7,9 @@ from utils.web_search import search_for_microservice
 from utils.helpers import read_code
 from utils.helpers import find_similar_apis
 from utils.helpers import parse_rag_response
+from utils.prompts import create_summary_prompt
+from utils.prompts import create_implementation_prompt
+from utils.prompts import create_merger_prompt
 
 # check ensemble argument
 parser = argparse.ArgumentParser()
@@ -41,55 +44,6 @@ if ensemble:
         "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO", torch_dtype=torch.float16, device_map="auto"
     )
 
-# summarization prompt (pass 1)
-summary_prompt = """
-Summarize the purpose of this internal API. Just say what it does.
-
-Path: {path}
-Code:
-{code}
-"""
-
-# implementation prompt (pass 2)
-main_prompt = """
-You are a senior software engineer assistant. A developer has provided an API feature request (INPUT API), and your job is to review both internal APIs (RECOMMENDED INTERNAL APIs) and relevant open-source examples (OPTIONAL EXTERNAL APIs) to offer specific, implementation-level guidance.
-
-For each recommended API (internal or external), respond using this format:
-
----
-**Source:** <file path or GitHub URL>  
-**Summary:** <1–2 sentence summary of what the code does, based on filename and contents.>  
-**Implementation Guidance:**  
-- Explain how this code is related to the INPUT API functionality.  
-- Reference specific function names, classes, or logic.  
-- Avoid generic phrases — clearly map features from this code to possible components in the INPUT API.  
-- If external, suggest how this repo might be used as a reference only (not directly imported).  
----
-
-**Rules:**
-- Be concise but technically detailed.
-- For INTERNAL APIs: treat them as available for direct use.
-- For EXTERNAL APIs: treat them as optional *inspiration only* — do not assume they are installed or imported.
-- Avoid generalities like “create a task queue” unless directly supported by the source code.
-- Do not mention proprietary APIs (e.g., Stripe, Twitter).
-- Use only the provided materials.
-
-### INPUT API  
-{input_api}
-
-### RECOMMENDED INTERNAL APIs (with code excerpts and summaries)  
-{internal_apis}
-
-### OPTIONAL EXTERNAL APIs (from public repositories or documentation)  
-{external_apis}
-
-**Final Instructions:**
-- Include **all internal APIs** in your response unless clearly irrelevant.
-- Include **one or two external APIs** if they offer concrete implementation ideas. Be sure to include the github url.
-- Do **not** restate features (e.g., “this has user registration”); explain how they are implemented.
-- Include **code examples** from the RECOMMENDED INTERNAL APIs where implementation details are relevant.
-"""
-
 # get user input and query vector db
 user_input = input("Input an API description: ")
 rag_response = find_similar_apis(collection=collection, text_input=user_input)
@@ -100,7 +54,7 @@ internal_blocks = []
 for path, doc in rag:
     code = read_code(path)
     truncated_code = code[:1500]
-    input_summary = summary_prompt.format(path=path, code=truncated_code)
+    input_summary = create_summary_prompt(path=path, code=truncated_code)
     input_ids = mistral_tokenizer(input_summary, return_tensors="pt").input_ids.to(mistral_model.device)
     output = mistral_model.generate(input_ids, max_new_tokens=128)
     summary = mistral_tokenizer.decode(output[0][input_ids.shape[1]:], skip_special_tokens=True)
@@ -117,7 +71,7 @@ external_apis = search_for_microservice(user_input)
 external_formatted = external_apis.strip() if external_apis else "None provided"
 
 # final input
-final_input = main_prompt.format(
+final_input = create_implementation_prompt(
     input_api=user_input,
     internal_apis="\n".join(internal_blocks),
     external_apis=external_formatted
@@ -138,31 +92,8 @@ else:
     llama_output = llama_model.generate(llama_ids, max_new_tokens=2048)
     llama_text = llama_tokenizer.decode(llama_output[0][llama_ids.shape[1]:], skip_special_tokens=True)
 
-    # set up prompt for merger to analyze input from mistral and llama
-    merger_prompt = f"""
-    You are an expert software assistant. Two AI models provided implementation guidance for the same API request.
-
-    Your job is to merge the best parts of each response into a single, coherent, structured recommendation for the developer. Remove redundant content, correct hallucinations, and preserve all specific and helpful implementation suggestions.
-
-    Each API block should follow this format:
-
-    ---
-    **Source:** <file path or GitHub URL>
-    **Summary:** <what the code does>
-    **Implementation Guidance:** <how it helps implement the INPUT API>
-    ---
-
-    ### INPUT API
-    {user_input}
-
-    ### Assistant 1 (Mistral) Output
-    {mistral_text}
-
-    ### Assistant 2 (LLaMA) Output
-    {llama_text}
-    """
-
-    # generate with merger
+    # generate merger output
+    merger_prompt = create_merger_prompt(user_input=user_input, mistral_text=mistral_text, llama_text=llama_text)
     refiner_ids = merger_tokenizer(merger_prompt, return_tensors="pt").input_ids.to(merger_model.device)
     refiner_output = merger_model.generate(refiner_ids, max_new_tokens=3072)
     final_response = merger_tokenizer.decode(refiner_output[0][refiner_ids.shape[1]:], skip_special_tokens=True)
