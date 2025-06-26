@@ -13,3 +13,8 @@ def parse_rag_response(rag_response):
 def read_code(filename):
     with open(filename, 'r') as f:
         return f.read()
+
+def generate_text(model, tokenizer, input_text, max_new_tokens):
+    input_ids = tokenizer(input_text, return_tensors="pt").input_ids.to(model.device)
+    output = model.generate(input_ids, max_new_tokens=max_new_tokens)
+    return tokenizer.decode(output[0][input_ids.shape[1]:], skip_special_tokens=True)

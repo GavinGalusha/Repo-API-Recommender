@@ -7,6 +7,7 @@ from utils.web_search import search_for_microservice
 from utils.helpers import read_code
 from utils.helpers import find_similar_apis
 from utils.helpers import parse_rag_response
+from utils.helpers import generate_text
 from utils.prompts import create_summary_prompt
 from utils.prompts import create_implementation_prompt
 from utils.prompts import create_merger_prompt
@@ -55,9 +56,7 @@ for path, doc in rag:
     code = read_code(path)
     truncated_code = code[:1500]
     input_summary = create_summary_prompt(path=path, code=truncated_code)
-    input_ids = mistral_tokenizer(input_summary, return_tensors="pt").input_ids.to(mistral_model.device)
-    output = mistral_model.generate(input_ids, max_new_tokens=128)
-    summary = mistral_tokenizer.decode(output[0][input_ids.shape[1]:], skip_special_tokens=True)
+    summary = generate_text(model=mistral_model, tokenizer=mistral_tokenizer, input_text=input_summary, max_new_tokens=128)
 
     internal_blocks.append(f"""---
 Path: {path}
@@ -78,9 +77,7 @@ final_input = create_implementation_prompt(
 )
 
 # generate response with Mistral
-mistral_ids = mistral_tokenizer(final_input, return_tensors="pt").input_ids.to(mistral_model.device)
-mistral_output = mistral_model.generate(mistral_ids, max_new_tokens=2048)
-mistral_text = mistral_tokenizer.decode(mistral_output[0][mistral_ids.shape[1]:], skip_special_tokens=True)
+mistral_text = generate_text(model=mistral_model, tokenizer=mistral_tokenizer, input_text=final_input, max_new_tokens=2048)
 
 if not ensemble:
     with open("output.txt", "w") as f:
@@ -88,15 +85,11 @@ if not ensemble:
     print("Output saved to output.txt.")
 else:
     # generate response with LLaMA
-    llama_ids = llama_tokenizer(final_input, return_tensors="pt").input_ids.to(llama_model.device)
-    llama_output = llama_model.generate(llama_ids, max_new_tokens=2048)
-    llama_text = llama_tokenizer.decode(llama_output[0][llama_ids.shape[1]:], skip_special_tokens=True)
+    llama_text = generate_text(model=llama_model, tokenizer=llama_tokenizer, input_text=final_input, max_new_tokens=2048)
 
     # generate merger output
     merger_prompt = create_merger_prompt(user_input=user_input, mistral_text=mistral_text, llama_text=llama_text)
-    refiner_ids = merger_tokenizer(merger_prompt, return_tensors="pt").input_ids.to(merger_model.device)
-    refiner_output = merger_model.generate(refiner_ids, max_new_tokens=3072)
-    final_response = merger_tokenizer.decode(refiner_output[0][refiner_ids.shape[1]:], skip_special_tokens=True)
+    final_response = generate_text(model=merger_model, tokenizer=merger_tokenizer, input_text=merger_prompt, max_new_tokens=3072)
 
     # write output to output file
     with open("output.txt", "w") as f:
