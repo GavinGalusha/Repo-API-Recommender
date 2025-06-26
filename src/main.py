@@ -19,7 +19,7 @@ ensemble = args.ensemble
 
 # access vector DB
 chroma_client = chromadb.PersistentClient(path="/data/hamaraa/Repo-API-Recommender/src/Database/database.chroma")
-collection = chroma_client.get_or_create_collection(name="my_collection")
+collection = chroma_client.get_or_create_collection(name="microservice_descriptions")
 
 # set and verify device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
