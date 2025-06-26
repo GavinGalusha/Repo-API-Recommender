@@ -1,13 +1,3 @@
-# create summarization prompt
-def create_summary_prompt(path, code) -> str:
-    return f"""
-    Summarize the purpose of this internal API. Just say what it does.
-
-    Path: {path}
-    Code:
-    {code}
-    """
-
 # create implementation prompt
 def create_implementation_prompt(input_api, internal_apis, external_apis) -> str:
     return f"""

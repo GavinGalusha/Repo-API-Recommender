@@ -4,11 +4,10 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
 from utils.web_search import search_for_microservice
-from utils.helpers import read_code
 from utils.helpers import find_similar_apis
 from utils.helpers import parse_rag_response
 from utils.helpers import generate_text
-from utils.prompts import create_summary_prompt
+from utils.helpers import generate_internal_prompt_blocks
 from utils.prompts import create_implementation_prompt
 from utils.prompts import create_merger_prompt
 
@@ -48,22 +47,9 @@ if ensemble:
 # get user input and query vector db
 user_input = input("Input an API description: ")
 rag_response = find_similar_apis(collection=collection, text_input=user_input)
-rag = parse_rag_response(rag_response)
+parsed_rag_response = parse_rag_response(rag_response)
 
-# summarize and format internal APIs
-internal_blocks = []
-for path, doc in rag:
-    code = read_code(path)
-    truncated_code = code[:1500]
-    input_summary = create_summary_prompt(path=path, code=truncated_code)
-    summary = generate_text(model=mistral_model, tokenizer=mistral_tokenizer, input_text=input_summary, max_new_tokens=128)
-
-    internal_blocks.append(f"""---
-Path: {path}
-Summary: {summary.strip()}
-Code:
-{truncated_code}
-""")
+internal_prompt_blocks = generate_internal_prompt_blocks(parsed_rag_response=parsed_rag_response)
 
 # include external repo if relevant
 external_apis = search_for_microservice(user_input)
@@ -72,7 +58,7 @@ external_formatted = external_apis.strip() if external_apis else "None provided"
 # final input
 final_input = create_implementation_prompt(
     input_api=user_input,
-    internal_apis="\n".join(internal_blocks),
+    internal_apis="\n".join(internal_prompt_blocks),
     external_apis=external_formatted
 )
 

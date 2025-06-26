@@ -14,7 +14,23 @@ def read_code(filename):
     with open(filename, 'r') as f:
         return f.read()
 
+# generate text with a model+tokenizer combo
 def generate_text(model, tokenizer, input_text, max_new_tokens):
     input_ids = tokenizer(input_text, return_tensors="pt").input_ids.to(model.device)
     output = model.generate(input_ids, max_new_tokens=max_new_tokens)
     return tokenizer.decode(output[0][input_ids.shape[1]:], skip_special_tokens=True)
+
+# format an internal block to go into system prompt
+def generate_internal_prompt_blocks(parsed_rag_response):
+    internal_blocks = []
+    for path, doc in parsed_rag_response:
+        code = read_code(path)
+        truncated_code = code[:1500]
+
+        internal_blocks.append(f"""---
+        Path: {path}
+        Summary: {doc.strip()}
+        Code:
+        {truncated_code}
+        """)
+    return internal_blocks
