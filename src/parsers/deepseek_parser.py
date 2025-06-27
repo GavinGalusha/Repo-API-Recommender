@@ -19,7 +19,7 @@ bnb_conf = BitsAndBytesConfig(
     bnb_4bit_compute_type=torch.bfloat16,
     bnb_4bit_use_double_quant=True,
 )
-MODEL_NAME = "deepseek-ai/deepseek-coder-6.7b-Instruct-hf"
+MODEL_NAME = "deepseek-ai/deepseek-coder-6.7b-instruct"
 CODE_EXTENSIONS = {'.py', '.js', '.ts', '.java', '.go'}
 ROOT_DIR = "cloned"
 OUTPUT_FILE = "api_descriptions_deepseek_coder_6pt7b.json"
