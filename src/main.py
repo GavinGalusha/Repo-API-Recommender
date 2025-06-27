@@ -50,7 +50,7 @@ rag_response = find_similar_apis(collection=collection, text_input=user_input)
 parsed_rag_response = parse_rag_response(rag_response)
 internal_prompt_blocks = generate_internal_prompt_blocks(parsed_rag_response=parsed_rag_response)
 
-# include external repo if relevant
+# include external repo
 external_apis = search_for_microservice(user_input)
 external_formatted = external_apis.strip() if external_apis else "None provided"
 
@@ -65,8 +65,7 @@ final_input = create_implementation_prompt(
 mistral_text = generate_text(model=mistral_model, tokenizer=mistral_tokenizer, input_text=final_input, max_new_tokens=2048)
 
 if not ensemble:
-    with open("output.txt", "a") as f:
-        f.write(mistral_text)
+    final_response = mistral_text
 else:
     # generate response with LLaMA
     llama_text = generate_text(model=llama_model, tokenizer=llama_tokenizer, input_text=final_input, max_new_tokens=2048)
@@ -75,7 +74,6 @@ else:
     merger_prompt = create_merger_prompt(user_input=user_input, mistral_text=mistral_text, llama_text=llama_text)
     final_response = generate_text(model=merger_model, tokenizer=merger_tokenizer, input_text=merger_prompt, max_new_tokens=3072)
 
-    # write output to output file
-    with open("output.txt", "a") as f:
-        f.write(final_response)
+with open("output.txt", "w") as f:
+    f.write(final_response)
 print("Output saved to output.txt.")
