@@ -65,7 +65,7 @@ final_input = create_implementation_prompt(
 mistral_text = generate_text(model=mistral_model, tokenizer=mistral_tokenizer, input_text=final_input, max_new_tokens=2048)
 
 if not ensemble:
-    with open("output.txt", "w") as f:
+    with open("output.txt", "a") as f:
         f.write(mistral_text)
 else:
     # generate response with LLaMA
@@ -76,6 +76,6 @@ else:
     final_response = generate_text(model=merger_model, tokenizer=merger_tokenizer, input_text=merger_prompt, max_new_tokens=3072)
 
     # write output to output file
-    with open("output.txt", "w") as f:
+    with open("output.txt", "a") as f:
         f.write(final_response)
 print("Output saved to output.txt.")
