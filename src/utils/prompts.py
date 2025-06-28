@@ -62,3 +62,30 @@ def create_merger_prompt(user_input, mistral_text, llama_text) -> str:
     ### Assistant 2 (LLaMA) Output
     {llama_text}
     """
+
+# create project summary prompt
+def create_project_summary_prompt(raw_api_descriptions: str) -> str:
+    return f"""
+    You are a senior software engineer assistant.
+
+    Your task is to read a set of REST API descriptions extracted from a software repository and write a high-level technical summary of what the project does *as a whole*. You should explain:
+    - The **primary goal** or purpose of the system.
+    - How the different REST endpoints **interact or relate** to each other.
+    - What major **subsystems or components** are implied by these APIs.
+    - Any **domain-specific patterns** you can infer (e.g., e-commerce, authentication, metrics, ML inference).
+
+    Your response should:
+    - Be **3–6 sentences** long.
+    - Avoid quoting or copying individual endpoint descriptions.
+    - Avoid hallucinating functionality — only use what's implied by the APIs.
+    - Treat this as an internal technical note for engineers.
+
+    ### RAW API DESCRIPTIONS
+    {raw_api_descriptions}
+
+    **Final Instructions:**
+    - Focus on how the APIs fit together into a coherent service.
+    - Avoid generic phrases like “this project includes various APIs.”
+    - Do not reference specific file paths or filenames.
+    - Assume the project is self-contained and the description should reflect what someone reading the APIs alone would understand about the system.
+    """

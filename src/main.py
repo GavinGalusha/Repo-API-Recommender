@@ -1,3 +1,4 @@
+import json
 import argparse
 import chromadb
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -10,12 +11,36 @@ from utils.helpers import generate_text
 from utils.helpers import generate_internal_prompt_blocks
 from utils.prompts import create_implementation_prompt
 from utils.prompts import create_merger_prompt
+from utils.prompts import create_project_summary_prompt
+from walker import walk_repo
+
 
 # check ensemble argument
 parser = argparse.ArgumentParser()
+parser.add_argument('--repo_path', type=str)
 parser.add_argument('--ensemble', action=argparse.BooleanOptionalAction, default=False)
+parser.add_argument('--description', action=argparse.BooleanOptionalAction, default=False)
 args = parser.parse_args()
 ensemble = args.ensemble
+repo_path = args.repo_path
+description_condition = args.description
+
+if repo_path:
+    results = walk_repo(repo_path)
+
+    summaries = []
+    for r in results:
+        try:
+            entry = json.loads(r)
+            summaries.append(entry['endpoints']['api_summary'])
+        except Exception as e:
+            print(e)
+
+    api_summary = '\n'.join(summaries) if summaries else "No REST APIs were found in this repo"
+elif description_condition:
+    api_summary = input("Describe an API in plain text: ")
+else:
+    raise ValueError("You must provide either --repo_path or --description.")
 
 # access vector DB
 chroma_client = chromadb.PersistentClient(path="/data/hamaraa/Repo-API-Recommender/src/Database/database.chroma")
@@ -45,18 +70,19 @@ if ensemble:
     )
 
 # format RAG code and descriptions
-user_input = input("Input an API description: ")
-rag_response = find_similar_apis(collection=collection, text_input=user_input)
+project_summary_prompt = create_project_summary_prompt(api_summary)
+description = generate_text(model=mistral_model, tokenizer=mistral_tokenizer, input_text=project_summary_prompt, max_new_tokens=512)
+rag_response = find_similar_apis(collection=collection, text_input=description)
 parsed_rag_response = parse_rag_response(rag_response)
 internal_prompt_blocks = generate_internal_prompt_blocks(parsed_rag_response=parsed_rag_response)
 
 # include external repo
-external_apis = search_for_microservice(user_input)
+external_apis = search_for_microservice(api_summary)
 external_formatted = external_apis.strip() if external_apis else "None provided"
 
 # final input
 final_input = create_implementation_prompt(
-    input_api=user_input,
+    input_api=api_summary,
     internal_apis="\n".join(internal_prompt_blocks),
     external_apis=external_formatted
 )
@@ -71,9 +97,9 @@ else:
     llama_text = generate_text(model=llama_model, tokenizer=llama_tokenizer, input_text=final_input, max_new_tokens=2048)
 
     # generate merger output
-    merger_prompt = create_merger_prompt(user_input=user_input, mistral_text=mistral_text, llama_text=llama_text)
+    merger_prompt = create_merger_prompt(user_input=api_summary, mistral_text=mistral_text, llama_text=llama_text)
     final_response = generate_text(model=merger_model, tokenizer=merger_tokenizer, input_text=merger_prompt, max_new_tokens=3072)
 
-with open("output.txt", "w") as f:
+with open("output.txt", "w", encoding='utf-8') as f:
     f.write(final_response)
 print("Output saved to output.txt.")
