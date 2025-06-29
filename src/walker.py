@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+import re
 import os
 import json
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
@@ -71,11 +73,11 @@ def run_model(prompt, max_tokens=1024):
     return tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
 
 def extract_json_string(s):
-    json_start = s.find('{')
-    json_end = s.rfind('}') + 1
-    if json_start == -1 or json_end == -1:
+    # try to find the first { and last }, and extract what's in between
+    match = re.search(r'\{.*\}', s, re.DOTALL)
+    if not match:
         raise ValueError("No JSON object found in string.")
-    return s[json_start:json_end]
+    return match.group(0)
 
 def has_negative_match(response) -> bool:
     negatives = ['ENDPOINTS', 'There are no REST API endpoints', \
@@ -116,3 +118,33 @@ def walk_repo(root_dir):
             except Exception as e:
                 print(f"[ERROR] Failed to process {filepath}: {e}")
     return results
+
+def read_and_check_file(filepath):
+    try:
+        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            code = f.read()
+
+        prompt = build_prompt(code)
+        response = run_model(prompt)
+        print(response)
+        negative_match = has_negative_match(response)
+        
+        if negative_match:
+            n += 1
+            print('got a negative')
+            return None
+        else:
+            try:
+                print('got a positive')
+                j = extract_json_string(response)
+                print(j)
+                json_obj = json.loads(j)
+                print(json_obj)
+                return {
+                    "file": filepath,
+                    "endpoints": json_obj
+                }
+            except json.JSONDecodeError:
+                print(f"[WARN] Failed to parse JSON for {filepath}")
+    except Exception as e:
+        print(f"[ERROR] Failed to process {filepath}: {e}")

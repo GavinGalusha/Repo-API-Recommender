@@ -12,17 +12,19 @@ from utils.helpers import generate_internal_prompt_blocks
 from utils.prompts import create_implementation_prompt
 from utils.prompts import create_merger_prompt
 from utils.prompts import create_project_summary_prompt
-from walker import walk_repo
+from walker import read_and_check_file, walk_repo
 
 
 # check ensemble argument
 parser = argparse.ArgumentParser()
 parser.add_argument('--repo_path', type=str)
+parser.add_argument('--file_path', type=str)
 parser.add_argument('--ensemble', action=argparse.BooleanOptionalAction, default=False)
 parser.add_argument('--description', action=argparse.BooleanOptionalAction, default=False)
 args = parser.parse_args()
 ensemble = args.ensemble
 repo_path = args.repo_path
+file_path = args.file_path
 description_condition = args.description
 
 if repo_path:
@@ -35,8 +37,11 @@ if repo_path:
             summaries.append(entry['endpoints']['api_summary'])
         except Exception as e:
             print(e)
-
     api_summary = '\n'.join(summaries) if summaries else "No REST APIs were found in this repo"
+elif file_path:
+    result = read_and_check_file(file_path)
+    api_summary = result['endpoints']['api_summary'] if result else "No REST API found in this file."
+
 elif description_condition:
     api_summary = input("Describe an API in plain text: ")
 else:
