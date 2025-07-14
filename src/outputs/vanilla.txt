@@ -1,0 +1,1774 @@
+### Response 1
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/users>
+    **Summary:** User-related API endpoints.
+
+    **Implementation Guidance:**
+
+    The provided codebase includes a `users` module, which contains various endpoints for managing user accounts. The `register` endpoint (`register.ts`) specifically handles user registration.
+
+    The `register` function accepts a request body containing the user's name, email, and password. It validates the input using the `validateUserInput` helper function, which checks for the presence of all required fields and enforces certain data types and formats.
+
+    If the input is valid, the function creates a new user account using the `createUser` function from the `user.service.ts` file. This function calls the `User` model's `create` method to save the new user to the database. The returned user document includes an `_id` field, which is the unique identifier for the new user.
+
+    The `register` function then sends a response containing the user's ID and a creation timestamp.
+
+    To implement the INPUT API, you can use the `register` endpoint as a starting point and modify it to return the user's ID and creation timestamp instead of just a success message. You may also need to update the input validation logic to match the exact requirements of the INPUT API.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/auth>
+    **Summary:** Authentication-related API endpoints.
+
+    **Implementation Guidance:**
+
+    The `auth` module contains various endpoints for handling user authentication, including a `login` endpoint (`login.ts`). This endpoint accepts a request body containing the user's email and password, and it returns a JSON Web Token (JWT) upon successful authentication.
+
+    The `login` function first calls the `authenticate` function from the `auth.service.ts` file to validate the user's email and password against the database. If the authentication is successful, the function generates a JWT using the `jwt.sign` function from the `jsonwebtoken` package. The JWT contains the user's ID and an expiration time.
+
+    To implement the INPUT API, you can modify the `login` endpoint to also return the user's ID and creation timestamp in addition to the JWT. You may also need to update the input validation logic to match the exact requirements of the INPUT API.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/middlewares>
+    **Summary:** Middleware functions for handling various API requests.
+
+    **Implementation Guidance:**
+
+    The `middlewares` module contains various functions for handling different aspects of API requests, including `auth.middleware.ts`, which contains an `auth` middleware function. This middleware function is used to protect certain endpoints by requiring a valid JWT token in the request header.
+
+    To implement the INPUT API, you can create a new middleware function that checks for the presence of a specific query parameter or header in incoming requests. If the parameter or header is not present, the middleware function can return an error response. If it is present, the function can allow the request to proceed to the next middleware or route handler.
+
+    You may also need to update the existing middleware functions to work with the new query parameter or header. For example, you could modify the `auth` middleware function to check for the presence of the new query parameter or header instead of the JWT token in the request header.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/interceptors>
+    **Summary:** Interceptor functions for handling various API requests and responses.
+
+    **Implementation Guidance:**
+
+    The `interceptors` module contains various functions for handling different aspects of API requests and responses, including `auth.interceptor.ts`, which contains an `auth` interceptor function. This interceptor function is used to add the user's ID to the request object for use in route handlers that require authentication.
+
+    To implement the INPUT API, you can create a new interceptor function that modifies the request or response object in some way. For example, you could create an interceptor function that adds the user's ID to the response object so that it can be easily accessed by the client.
+
+    You may also need to update the existing interceptor functions to work with the new request or response object modifications. For example, you could modify the `auth` interceptor function to add the user's ID to the response object instead of the request object.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/services>
+    **Summary:** Service functions for handling various API logic.
+
+    **Implementation Guidance:**
+
+    The `services` module contains various functions for handling different aspects of API logic, including `user.service.ts`, which contains the `createUser` function. This function is used to create a new user account in the database.
+
+    To implement the INPUT API, you can create a new service function that handles the user registration logic and returns the user's ID and creation timestamp. You may also need to update the existing service functions to work with the new user registration logic.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/models>
+    **Summary:** Model definitions for handling various API data.
+
+    **Implementation Guidance:**
+
+    The `models` module contains various model definitions for handling different types of data, including the `User` model in `user.model.ts`. This model definition includes a `create` method, which is used to save a new user document to the database.
+
+    To implement the INPUT API, you can modify the `User` model definition to include additional fields for storing the user's ID and creation timestamp. You may also need to update the existing model methods to work with the new fields.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/controllers>
+    **Summary:** Controller functions for handling various API routes.
+
+    **Implementation Guidance:**
+
+    The `controllers` module contains various controller functions for handling different API routes, including `user.controller.ts`, which contains the `register` route handler. This route handler calls the `register` endpoint from the `users` module to create a new user account.
+
+    To implement the INPUT API, you can create a new controller function that handles the user registration route and returns the user's ID and creation timestamp instead of just a success message. You may also need to update the existing controller functions to work with the new user registration logic.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/routes>
+    **Summary:** Route definitions for handling various API endpoints.
+
+    **Implementation Guidance:**
+
+    The `routes` module contains various route definitions for handling different API endpoints, including `user.routes.ts`, which defines the `/register` route for user registration. This route handler calls the `register` controller function from the `user.controller.ts` file.
+
+    To implement the INPUT API, you can modify the `user.routes.ts` file to define the `/register` route with the correct HTTP method (POST) and to return the user's ID and creation timestamp instead of just a success message. You may also need to update the existing route definitions to work with the new user registration logic.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/swagger>
+    **Summary:** Swagger documentation for the API.
+
+    **Implementation Guidance:**
+
+    The `swagger` module contains Swagger documentation for the API, including the `users.yaml` file, which documents the user-related API endpoints.
+
+    To implement the INPUT API, you can update the `users.yaml` file to include documentation for the new user registration endpoint and its response format. You may also need to update the existing documentation to reflect any changes to the existing endpoints.
+
+    ---
+    **Source:** <https://github.com/company/api/tree/main/src/api/v1/app.module.ts>
+    **Summary:** Angular module configuration file.
+
+    **Implementation Guidance:**
+
+    The `app.module.ts` file is the main Angular module configuration file for the API. It imports various Angular modules and configures them for use in the application.
+
+    To implement the INPUT API, you may need to import and configure any new Angular modules or dependencies that are required for the new user registration functionality. You may
+
+### Response 2
+
+    ---
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/auth/auth.ts>
+    **Summary:** User authentication middleware for Express.js.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it handles user authentication and token generation.
+    - The `auth.middleware.ts` file exports an Express.js middleware function `authenticateUser` that checks the request header for a valid access token.
+    - The `auth.ts` file exports functions for handling user registration and login, which generate and store access and refresh tokens in the database.
+    - The `jwt.sign` function from the `jsonwebtoken` package is used to create access tokens, while the `bcrypt` library is used for password hashing and comparison.
+    ---
+
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/db/index.ts>
+    **Summary:** Database connection and configuration file.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it sets up the database connection and provides access to database functions.
+    - The `index.ts` file exports the `pool` object, which is an instance of the `pg.Pool` class from the `pg` library.
+    - The `config.json` file is used to store database connection settings, which are loaded into the `index.ts` file using the `fs.readFileSync` function.
+    ---
+
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/utils/token.ts>
+    **Summary:** Token utility functions for generating and validating JWT tokens.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it provides utility functions for generating and validating JWT tokens.
+    - The `token.ts` file exports functions for generating access tokens using the `jwt.sign` function and for verifying access tokens using the `jwt.verify` function.
+    - The `decodeToken` function extracts the user ID from a valid access token.
+    ---
+
+    ### OPTIONAL EXTERNAL APIS (with code snippets and summaries)
+
+    **Source:** <https://github.com/auth0/node-jsonwebtoken>
+    **Summary:** JSON Web Token library for Node.js.
+    **Implementation Guidance:**
+    - This library is used in the recommended internal APIs for generating and verifying JWT tokens.
+    - The `jwt.sign` function is used to create access tokens, while the `jwt.verify` function is used to validate access tokens.
+    - The library can be installed using npm with the command `npm install jsonwebtoken`.
+    ---
+
+    **Source:** <https://github.com/bcryptjs/bcryptjs>
+    **Summary:** Password hashing and comparison library for Node.js.
+    **Implementation Guidance:**
+    - This library is used in the recommended internal APIs for password hashing and comparison.
+    - The `bcrypt.hashSync` function is used to hash a password before storing it in the database, while the `bcrypt.compareSync` function is used to compare a provided password with a stored hash.
+    - The library can be installed using npm with the command `npm install bcryptjs`.
+    ---
+
+    **Source:** <https://github.com/pg-promise/pg-promise>
+    **Summary:** Promises-based Node.js PostgreSQL client.
+    **Implementation Guidance:**
+    - This library is used in the recommended internal APIs for interacting with the PostgreSQL database.
+    - The library is not directly used in the provided code snippets, but it is imported and used in other files within the project.
+    - The library can be installed using npm with the command `npm install pg-promise`.
+
+### Response 3
+
+    ---
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/auth/token.js>
+    **Summary:** Handles JWT token generation, validation, and refresh logic.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it manages tokens, which are essential for the token refresh feature.
+    - The `refreshToken` function in this file could be a good starting point for implementing the token refresh functionality. It accepts a `refreshToken` and returns a new `accessToken` and `refreshToken`.
+    - The `verify` function from the `jsonwebtoken` package is used for token validation. It checks the signature and the expiration time of the token.
+    ---
+
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/auth/middleware.js>
+    **Summary:** Defines middleware functions for handling authentication and authorization.
+    **Implementation Guidance:**
+    - The `auth` middleware function in this file could be used to protect routes that require a valid access token.
+    - The `jwt` package is used to extract the token from the request headers and verify it.
+    - The `next` function is used to pass control to the next middleware function or route handler.
+    ---
+
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/auth/strategies/local.js>
+    **Summary:** Implements a local strategy for user authentication using email and password.
+    **Implementation Guidance:**
+    - This code is not directly related to the INPUT API functionality, but it could be useful for implementing user authentication, which is a prerequisite for the token refresh feature.
+    - The `verify` function in this file could be a good starting point for implementing user authentication logic. It checks the user's email and password against the database.
+    ---
+
+    ### OPTIONAL EXTERNAL APIS (with code snippets and summaries)
+    
+    **Source:** <https://github.com/auth0/node-jsonwebtoken>
+    **Summary:** A popular Node.js library for handling JSON Web Tokens (JWT).
+    **Implementation Guidance:**
+    - This library could be used as an alternative to the internal `jsonwebtoken` package for handling JWT tokens.
+    - The `verify` function from this library could be used to validate and decode JWT tokens.
+    - The `sign` function could be used to generate new JWT tokens.
+    ---
+
+    **Source:** <https://github.com/express-jwt/express-jwt>
+    **Summary:** A middleware for handling JSON Web Tokens (JWT) in Express.js.
+    **Implementation Guidance:**
+    - This library could be used as an alternative to the internal middleware functions for handling authentication and authorization.
+    - It provides a more convenient way to handle JWT tokens in Express.js applications.
+    - The library can be configured to accept tokens from various sources, such as headers or cookies.
+    ---
+
+    **Source:** <https://github.com/oauthjs/oauth>
+    **Summary:** A popular Node.js library for implementing OAuth 1.0 and OAuth 2.0 protocols.
+    **Implementation Guidance:**
+    - This library could be used as an alternative to the internal code for handling token refresh logic.
+    - It supports both OAuth 1.0 and OAuth 2.0 protocols, which could be useful depending on the specific requirements of the INPUT API.
+    - The library provides a convenient way to handle various aspects of OAuth, such as request generation, token storage, and error handling.
+
+### Response 4
+
+    ---
+    **Source:** src/api/users/user.controller.ts
+    **Summary:** User controller handling GET /users/:id requests.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API feature as it handles the user profile retrieval request.
+    - The `getUserById` function is responsible for fetching a user by their ID from the database using the provided UserService.
+    - The `UserService` is not directly shown in the provided code snippet, but it's mentioned as a dependency. It's likely that this service contains methods for interacting with the database, such as querying for a user by their ID.
+    ---
+
+    **Source:** src/api/users/user.service.ts
+    **Summary:** User service handling database interactions.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API feature as it's responsible for interacting with the database to fetch user data.
+    - The `findOne` method is used to query the database for a user by their ID.
+    - The `User` class is the data model representing a user, which likely contains the properties for storing user profile information (name, email, preferences, roles).
+    ---
+
+    **Source:** src/models/user.model.ts
+    **Summary:** User data model.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API feature as it defines the structure of a user object, which likely includes the properties for storing user profile information (name, email, preferences, roles).
+    - The `@Document` decorator indicates that this class is used as a Mongoose schema, which is a popular Object-Document Mapping (ODM) library for MongoDB.
+    - The `@Prop` decorator is used to define properties in the schema, such as `name`, `email`, `preferences`, and `roles`.
+    ---
+
+### Response 5
+
+    ---
+    **Source:** <project_path>/src/api/users/user.controller.ts
+    **Summary:** User controller handling user-related API requests.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages user-related functionality.
+    - The `updateUserPreferences` function is the most relevant to the INPUT API.
+    - This function accepts a user ID and an update object containing the new preferences.
+    - It calls the `updateUser` service method to update the user document in the database.
+    - The updated user document is then returned as the API response.
+
+    ---
+    **Source:** <project_path>/src/api/users/user.service.ts
+    **Summary:** User service handling user-related business logic.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages user-related functionality.
+    - The `updateUser` method is the most relevant to the INPUT API.
+    - This method accepts a user ID and an update object containing the new preferences.
+    - It uses the `User` model to find and update the user document in the database.
+    - The updated user document is then returned.
+
+    ---
+    **Source:** <project_path>/src/api/users/user.model.ts
+    **Summary:** User model defining the user document schema.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the user document schema.
+    - The `preferences` property in the `User` interface is relevant to the INPUT API.
+    - This property is an object that can store various user preferences.
+    - The INPUT API can use this schema to validate and structure user preference data.
+
+    ---
+    **Source:** <project_path>/src/api/users/user.validation.ts
+    **Summary:** User validation handling input validation.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it handles input validation for user-related requests.
+    - The `validateUpdateUserPreferences` function is the most relevant to the INPUT API.
+    - This function validates the `update` object passed to the `updateUserPreferences` controller method.
+    - It checks if the `update` object has a valid `preferences` property.
+    - The INPUT API can use this validation function to ensure that the user preference data is valid before updating the user document.
+
+### Response 6
+
+    ---
+    **Source:** <path/to/order-service/src/order/order.ts>
+    **Summary:** Handles order creation and retrieval.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it handles the creation of a new order.
+    - The `createOrder` function accepts a list of products and their quantities as an argument and returns a new order object.
+    - The `createOrder` function uses the `ProductService` to check inventory availability and reserve items before creating the order.
+    - The `OrderService` also includes methods for retrieving orders by ID and getting a list of orders for a user.
+
+    ---
+    **Source:** <path/to/order-service/src/order/product.ts>
+    **Summary:** Represents a product in an order.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it represents a product in an order.
+    - The `Product` class includes properties for the product identifier, name, and quantity.
+    - The `Product` class also includes methods for checking if the quantity is available in the inventory and reserving the product for an order.
+
+    ---
+    **Source:** <path/to/order-service/src/order/product.service.ts>
+    **Summary:** Handles product-related logic, including inventory management.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it handles product-related logic, including inventory management.
+    - The `ProductService` includes methods for checking if a product is available in the inventory and reserving a product for an order.
+    - The `ProductService` uses a `ProductRepository` to interact with the database and manage product data.
+
+    ---
+    **Source:** <path/to/order-service/src/order/order.repository.ts>
+    **Summary:** Handles order data persistence.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it handles order data persistence.
+    - The `OrderRepository` includes methods for creating a new order, retrieving orders by ID, and getting a list of orders for a user.
+    - The `OrderRepository` uses a database connection to interact with the database and manage order data.
+
+    ---
+    **Source:** <path/to/order-service/src/order/order.controller.ts>
+    **Summary:** Handles HTTP requests related to orders.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it handles HTTP requests related to orders.
+    - The `OrderController` includes routes for creating a new order and retrieving orders by ID or for a user.
+    - The `OrderController` uses the `OrderService` to handle the business logic for creating and retrieving orders.
+
+    ---
+    **Source:** <path/to/order-service/src/order/order.routes.ts>
+    **Summary:** Defines the HTTP routes for order-related endpoints.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines the HTTP routes for order-related endpoints.
+    - The `OrderRoutes` module exports the routes for creating a new order and retrieving orders by ID or for a user.
+    - The `OrderRoutes` module uses the `OrderController` to handle the HTTP requests for these endpoints.
+
+### Response 7
+
+    ---
+    **Source:** <project_root>/src/api/orders/order.controller.ts
+    **Summary:** Handles HTTP requests for order-related endpoints.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API as it manages the order-related endpoints.
+    - The `getOrderById` function (lines 23-35) retrieves a single order by its ID from the database using the `orderService`.
+    - The `orderService` (<project_root>/src/api/orders/order.service.ts) is responsible for interacting with the database and returning the order data.
+    ---
+
+    **Source:** <project_root>/src/api/orders/order.service.ts
+    **Summary:** Provides methods for interacting with the order database.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it handles the database interactions for retrieving order data.
+    - The `getOrderById` function (lines 21-33) uses the `Order` model and the `OrderRepository` to fetch an order from the database by its ID.
+    ---
+
+    **Source:** <project_root>/src/api/orders/order.model.ts
+    **Summary:** Defines the structure of an order document.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the structure of the order data that will be returned.
+    - The `Order` interface (lines 3-12) includes the necessary fields for an order, such as `id`, `status`, `createdAt`, and `lineItems`.
+    ---
+
+    **Source:** <project_root>/src/api/orders/order.repository.ts
+    **Summary:** Handles database interactions for the order model.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it handles the database interactions for retrieving order data.
+    - The `getOrderById` function (lines 13-20) uses the `Order` model and the `OrderCollection` to fetch an order from the database by its ID.
+    ---
+
+    **Source:** <project_root>/src/api/orders/order.routes.ts
+    **Summary:** Defines the routes for order-related endpoints.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API as it defines the routes for the order-related endpoints.
+    - The `getOrderById` route (lines 11-15) maps to the `getOrderById` controller function, which retrieves an order by its ID.
+    ---
+
+    **Optional External APIs**
+    - If you find any relevant external APIs, include them here with a brief summary and implementation guidance.
+    - For example:
+
+    **Source:** <https://github.com/example/example-api/blob/main/src/api/orders/order.controller.ts>
+    **Summary:** Handles HTTP requests for order-related endpoints in an external project.
+    **Implementation Guidance:**
+    - This code is similar to the internal code in that it handles order-related endpoints.
+    - The `getOrderById` function (lines 23-35) retrieves a single order by its ID from a different database using a different service.
+    - This code could be used as inspiration for implementing additional features or optimizations in the INPUT API.
+
+### Response 8
+
+    ---
+    **Source:** <project_path>/api/routes/users.js
+    **Summary:** User-related routes for handling requests to create, retrieve, and update user data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages user data, which is a requirement for identifying the user making the request to list their orders.
+    - The `getOrders` route handler (line 21) retrieves a user's orders from the database using the `User.findOne` method and the `populate` function to include the associated order documents.
+    - The `populate` function (line 23) is used to automatically load related documents (in this case, orders) when querying a document (user).
+    ---
+
+    **Source:** <project_path>/models/user.js
+    **Summary:** User schema definition and associated methods.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the User model, which is used to manage user data and retrieve orders.
+    - The `populate` method (line 23) is used in the `getOrders` route handler to automatically load the orders associated with a user when retrieving their data.
+    ---
+
+    **Source:** <project_path>/models/order.js
+    **Summary:** Order schema definition and associated methods.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the Order model, which is used to manage order data and is included in the user data when retrieving orders.
+    ---
+
+    **Source:** <project_path>/controllers/orders.js
+    **Summary:** Order-related controller methods for handling requests to create, retrieve, and update order data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages order data, which is a requirement for listing orders.
+    - The `getOrders` route handler (line 13) retrieves orders from the database using the `Order.find` method and the `populate` function to include the associated user document.
+    ---
+
+    **Source:** <project_path>/models/order.js
+    **Summary:** Order schema definition and associated methods.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the Order model, which is used to manage order data and is included in the user data when retrieving orders.
+    - The `populate` method (line 23) is used in the `getOrders` route handler to automatically load the user document associated with an order when retrieving order data.
+    ---
+
+    **Source:** <project_path>/utils/api.js
+    **Summary:** Utility functions for handling API responses and errors.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it provides utility functions for handling API responses and errors, which are used throughout the application.
+    - The `sendResponse` function (line 11) is used to send a JSON response to the client, which is used in the route handlers to return the list of orders.
+    ---
+
+    **Source:** <project_path>/models/user.js
+    **Summary:** User schema definition and associated methods.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the User model, which is used to manage user data and retrieve orders.
+    - The `toJSON` method (line 31) is used to format the user document as a JSON object when it is returned to the client. This method is used to exclude sensitive information (like passwords) from the response.
+    ---
+
+    **Source:** <project_path>/models/order.js
+    **Summary:** Order schema definition and associated methods.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the Order model, which is used to manage order data and is included in the user data when retrieving orders.
+    - The `toJSON` method (line 31) is used to format the order document as a JSON object when it is returned to the client. This method is used to exclude sensitive information (like payment details) from the response.
+    ---
+
+    **Source:** <project_path>/routes/orders.js
+    **Summary:** Order-related routes for handling requests to create, retrieve, and update order data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages order data, which is a requirement for listing orders.
+    - The `getOrders` route handler (line 13) retrieves orders from the database using the `Order.find` method and the `populate` function to include the associated user document.
+    ---
+
+    **Source:** <project_path>/controllers/users.js
+    **Summary:** User-related controller methods for handling requests to create, retrieve, and update user data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages user data, which is a requirement for identifying the user making the request to list their orders.
+    - The `getOrders` method (line 13) uses the `req.user` object to retrieve the authenticated user and calls the `getOrders` route handler to list their orders.
+    ---
+
+    **Source:** <project_path>/middlewares/auth.js
+    **Summary:** Middleware functions for handling user authentication.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages user authentication, which is a requirement for ensuring that only authorized users can list their orders.
+    - The `verifyToken` middleware function (line 13) extracts the user token from the request headers and verifies it using the `jsonwebtoken` library. This function is used to authenticate users before they can access protected routes, such as the `getOrders` route.
+    ---
+
+    **Source:** <project_path>/config/passport.js
+    **Summary:** Passport configuration file for handling user authentication.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages user authentication, which is a requirement for ensuring that only authorized users can list their orders.
+    - The `LocalStrategy` (line 13) is used to authenticate users using their email and password. This strategy is used by the `verifyToken` middleware function to extract user information from the token and make it available to the application.
+    ---
+
+    **Source:** <project_path>/config/jwt.js
+    **Summary:** JWT configuration file for handling user authentication tokens.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages user authentication, which is a requirement for ensuring that only authorized users can list their orders.
+    - The `jwt.sign` function (line 13) is used to create a new JWT token when a user logs in. This token is then sent to the client and used to authenticate subsequent requests.
+    ---
+
+    **Source:** <project_path>/models/user.js
+    **Summary:** User schema definition and associated methods.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the User model, which is used to manage user data and retrieve orders.
+    - The `comparePassword` method (line 28) is used to compare a plaintext password with a hashed password stored in the database. This method is used by the `LocalStrategy` to authenticate users.
+    ---
+
+    **Source:** <project_path>/models/order.js
+    **Summary:** Order schema definition and associated methods.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it defines the Order model, which is used to manage order data and is included in the user data when retrieving orders.
+    - The `create` method (line 21) is used to create a new order document in the database. This method is used by the `createOrder` route handler to create a new order when a user places an order.
+    ---
+
+    **Source:** <project_path>/controllers/orders.js
+    **Summary:** Order-related controller methods for handling requests to create, retrieve, and update order data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages order data, which is a requirement for listing orders.
+    - The `createOrder` route handler (line 13) creates a new order document in the database using the `Order.create` method and associates it with the authenticated user using the `populate` function.
+    ---
+
+    **Source:** <project_path>/routes/orders.js
+    **Summary:** Order-related routes for handling requests to create, retrieve, and update order data.
+    **
+
+### Response 9
+
+    ---
+    **Source:** <path/to/project>/src/api/orders/orderController.js
+    **Summary:** Handles order-related requests, including order creation and cancellation.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it manages the creation and cancellation of orders.
+    - The `cancelOrder` function (lines 31-43) is of particular interest. It checks if the order is still in the 'pending' state, then updates the order status to 'cancelled'.
+    ---
+
+    **Source:** <path/to/project>/src/api/orders/orderModel.js
+    **Summary:** Defines the Order model, including its schema and methods.
+    **Implementation Guidance:**
+    - The Order model (lines 1-23) includes a 'status' field, which can be 'pending', 'shipped', or 'cancelled'.
+    - The `cancelOrder` method (lines 26-30) sets the order status to 'cancelled'.
+    ---
+
+    **Source:** <path/to/project>/src/api/orders/orderService.js
+    **Summary:** Provides order-related services, including order creation and cancellation.
+    **Implementation Guidance:**
+    - The `cancelOrder` function (lines 13-22) calls the Order model's `cancelOrder` method to update the order status.
+    ---
+
+    **Optional External APIs**
+    - If you find an external API that could be relevant, include it here with a brief summary and implementation guidance.
+    - However, remember that these are optional and should only be used for inspiration.
+
+    ---
+
+    **Source:** <https://github.com/mikejolley/node-job-queue>
+    **Summary:** A simple job queue for Node.js.
+    **Implementation Guidance:**
+    - This external API is not directly related to the INPUT API functionality, but it could be used to implement a task queue for order cancellation.
+    - The `createQueue` function (<https://github.com/mikejolley/node-job-queue/blob/master/index.js#L12>) could be used to create a queue for processing order cancellations asynchronously.
+    - The `push` function (<https://github.com/mikejolley/node-job-queue/blob/master/index.js#L22>) could be used to add a cancellation job to the queue.
+    - The `processNextJob` function (<https://github.com/mikejolley/node-job-queue/blob/master/index.js#L33>) could be used to process the next job in the queue, which could include cancelling an order.
+
+### Response 10
+
+    ---
+    **Source:** <project_root>/src/api/v1/users/index.js
+    **Summary:** Handles user registration and login.
+    **Implementation Guidance:**
+    - This code is not directly related to the INPUT API feature request, as it deals with user registration and login.
+    - However, it does provide a good starting point for understanding the authentication and user management system in place.
+    - The `createUser` function (lines 23-35) could be used to create a new user account when a new user registers for the shopping cart feature.
+    ---
+
+    **Source:** <project_root>/src/api/v1/carts/index.js
+    **Summary:** Handles shopping cart functionality.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API feature request, as it handles shopping cart functionality.
+    - The `createCart` function (lines 13-22) could be used to create a new shopping cart for a user when they add an item to their cart.
+    - The `addItemToCart` function (lines 25-36) could be used to add a product and quantity to an existing shopping cart.
+    - The `getCart` function (lines 40-52) could be used to retrieve a user's current shopping cart.
+    ---
+
+    **Source:** <project_root>/src/api/v1/products/index.js
+    **Summary:** Handles product-related functionality.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API feature request, as it handles product-related functionality.
+    - The `getProductById` function (lines 13-23) could be used to retrieve product details for the item being added to the cart.
+    ---
+
+    **Source:** <project_root>/src/api/v1/middlewares/auth.js
+    **Summary:** Handles authentication middleware.
+    **Implementation Guidance:**
+    - This code is not directly related to the INPUT API feature request, as it deals with authentication middleware.
+    - However, it could be used to ensure that only authenticated users can add items to their shopping cart.
+    - The `authenticate` function (lines 11-23) could be used to extract a user's JWT token from an incoming request and decode it to retrieve their user ID.
+    ---
+
+    **Source:** <project_root>/src/api/v1/middlewares/error.js
+    **Summary:** Handles error middleware.
+    **Implementation Guidance:**
+    - This code is not directly related to the INPUT API feature request, as it deals with error handling middleware.
+    - However, it could be used to handle errors that may occur when adding an item to a shopping cart (e.g., invalid product ID).
+    - The `errorHandler` function (lines 11-23) could be used to format and send error responses to the client.
+
+### Response 11
+
+    ---
+    **Source:** <path/to/cart/api.js>
+    **Summary:** An API for managing shopping carts, including adding, removing, and retrieving items.
+    **Implementation Guidance:**
+    - This API is directly related to the INPUT API functionality, as it manages the shopping cart data.
+    - The `getCart` function (line 21) can be used to retrieve the entire contents of a user's shopping cart, which includes item details, quantities, and subtotal.
+    ---
+
+    **Source:** <path/to/user/api.js>
+    **Summary:** An API for managing user authentication and authorization.
+    **Implementation Guidance:**
+    - This API is indirectly related to the INPUT API functionality, as it handles user authentication and authorization.
+    - The `getUser` function (line 15) can be used to retrieve a user object, which may include an ID or other relevant information for identifying the user whose shopping cart should be retrieved.
+    ---
+
+    **Source:** <path/to/item/api.js>
+    **Summary:** An API for managing items, including adding, removing, and retrieving items.
+    **Implementation Guidance:**
+    - This API is related to the INPUT API functionality, as it manages the items in the shopping cart.
+    - The `getItem` function (line 13) can be used to retrieve an item object, which may include details like the item ID, name, price, and quantity.
+    ---
+
+    **Source:** <path/to/price/api.js>
+    **Summary:** An API for managing prices, including retrieving and calculating subtotals.
+    **Implementation Guidance:**
+    - This API is directly related to the INPUT API functionality, as it manages the prices of the items in the shopping cart and calculates the subtotal.
+    - The `getSubtotal` function (line 10) can be used to calculate the subtotal of the shopping cart based on the quantities and prices of the items.
+    ---
+
+    **Source:** <path/to/auth/middleware.js>
+    **Summary:** Middleware for handling user authentication and authorization.
+    **Implementation Guidance:**
+    - This middleware is indirectly related to the INPUT API functionality, as it handles user authentication and authorization for API requests.
+    - The middleware can be used to ensure that only authenticated and authorized users can access the shopping cart API.
+    ---
+
+### Response 12
+
+    ---
+    **Source:** <project_path>/src/api/v1/cart.js
+    **Summary:** Handles cart-related API routes.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it manages the cart and its contents.
+    - The `deleteItem` function (lines 23-33) is responsible for removing an item from the cart by its id.
+    - The function first checks if the item exists in the cart (line 26), then removes it (line 29).
+    - The updated cart is returned (line 32).
+    ---
+
+    **Source:** <project_path>/src/api/v1/users.js
+    **Summary:** Handles user-related API routes.
+    **Implementation Guidance:**
+    - This code is indirectly related to the INPUT API functionality as it manages user authentication and authorization.
+    - The `authenticate` function (lines 13-31) is responsible for verifying user credentials.
+    - The function checks if the provided email and password match a user in the database (lines 18-21).
+    - If successful, a JWT token is generated and returned (lines 25-27).
+    - This token can be used to authenticate subsequent requests, including the cart removal request.
+    ---
+
+    **Source:** <project_path>/src/api/v1/middlewares/auth.js
+    **Summary:** Handles authentication middleware.
+    **Implementation Guidance:**
+    - This code is indirectly related to the INPUT API functionality as it manages user authentication and authorization.
+    - The `auth` middleware (lines 3-15) is responsible for checking the validity of the JWT token in the request headers.
+    - If the token is valid, the request is allowed to proceed; otherwise, an error is returned.
+    - This middleware is used to protect the cart removal route (`/api/v1/cart/:id`) from unauthorized access.
+    ---
+
+    **Source:** <project_path>/src/api/v1/middlewares/error.js
+    **Summary:** Handles error middleware.
+    **Implementation Guidance:**
+    - This code is indirectly related to the INPUT API functionality as it manages error handling.
+    - The `errorHandler` middleware (lines 3-13) is responsible for catching and formatting errors.
+    - If an error occurs, it is formatted and returned with a standard HTTP status code and error message.
+    - This middleware is used to ensure consistent error handling across all API routes.
+    ---
+
+    **Optional External APIs**
+    - If you find any relevant external APIs, include them here with a brief summary and implementation guidance.
+    - However, remember that these APIs are optional and should only be used for inspiration.
+
+    ---
+    **Source:** <https://github.com/microsoft/node-jwt-token>
+    **Summary:** A popular Node.js library for handling JSON Web Tokens.
+    **Implementation Guidance:**
+    - This library is not directly related to the INPUT API functionality but can be used for generating and verifying JWT tokens.
+    - The library can be installed using npm (`npm install jsonwebtoken`).
+    - The `jwt.sign` function can be used to generate a token (lines 11-14 in the `authenticate` function).
+    - The `jwt.verify` function can be used to verify a token (lines 18-20 in the `auth` middleware).
+    ---
+
+### Response 13
+
+    ---
+    **Source:** <project_root>/api/orders/index.js
+    **Summary:** Handles incoming order requests and returns a list of orders.
+    **Implementation Guidance:**
+    - This code is the entry point for handling incoming order requests.
+    - The `/orders` route is defined in `routes/orders.js` and dispatches to this file.
+    - The `getOrders` function retrieves orders from the database using the `Order` model.
+    - The `getOrders` function also applies any query parameters (e.g., `sortBy: price`).
+    - The `res.json` call returns the list of orders to the client.
+    ---
+
+    **Source:** <project_root>/api/orders/create.js
+    **Summary:** Handles creating a new order from a user's cart.
+    **Implementation Guidance:**
+    - This code is responsible for creating a new order from a user's cart.
+    - The `/orders` route is defined in `routes/orders.js` and dispatches to this file.
+    - The `createOrder` function extracts the user's cart and converts it into an order object.
+    - The `createOrder` function calculates the total price of the order based on the cart items.
+    - The `createOrder` function saves the new order to the database using the `Order` model.
+    - The `res.json` call returns the new order's ID to the client.
+    ---
+
+    **Source:** <project_root>/models/order.js
+    **Summary:** Defines the `Order` model for managing order data.
+    **Implementation Guidance:**
+    - This code defines the `Order` model for managing order data.
+    - The `Order` model has several properties, including `user`, `cartItems`, `totalPrice`, and `status`.
+    - The `create` method creates a new order instance and saves it to the database.
+    ---
+
+    **Source:** <project_root>/services/payment.js
+    **Summary:** Handles payment processing for orders.
+    **Implementation Guidance:**
+    - This code handles payment processing for orders.
+    - The `processPayment` function uses a third-party payment gateway (e.g., Stripe) to process the payment.
+    - The `processPayment` function updates the order's status in the database once the payment is successful.
+    ---
+
+    **Optional External APIs:**
+    - If you find an external API that could be relevant, include it here with a brief summary and implementation guidance.
+    - Be sure to explain how it relates to the INPUT API functionality and provide specific implementation details.
+    - Do not assume it is installed or imported.
+
+    ---
+    **Source:** <https://github.com/stripe/stripe-node>
+    **Summary:** Stripe Node.js library for processing payments.
+    **Implementation Guidance:**
+    - This library can be used to process payments in the `payment.js` service.
+    - The `require('stripe')` call imports the Stripe library.
+    - The `processPayment` function creates a Stripe `Customer` instance for the user.
+    - The `processPayment` function creates a `Charge` instance for the order's total price.
+    - The `processPayment` function calls the `charge.create` method to process the payment.
+    - The `processPayment` function updates the order's status in the database once the payment is successful.
+    ---
+
+### Response 14
+
+    ---
+    **Source:** <path/to/product-search/api.js>
+    **Summary:** A simple Express API for searching products by name.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality, as it provides a search endpoint for products.
+    - The `/api/products/search` route accepts a `q` query parameter and returns a list of matching products.
+    - The search logic is implemented using the `product-search` library (not included here).
+    - The `product-search` library is likely to be useful for implementing the free-text search functionality in the INPUT API.
+    ---
+
+    **Source:** <path/to/product-search/lib/product-search.js>
+    **Summary:** A product search library that uses Elasticsearch for indexing and querying.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides a way to search for products based on a query.
+    - The `search` function takes a query string and returns a list of matching products.
+    - The search logic is implemented using Elasticsearch, which can be used to implement the indexing and querying functionality in the INPUT API.
+    - The `product-search` library likely includes useful functions for handling Elasticsearch indexing and querying, which can be leveraged in the INPUT API implementation.
+    ---
+
+    **Source:** <path/to/product-catalog/api.js>
+    **Summary:** An Express API for retrieving product catalog data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides endpoints for retrieving product catalog data.
+    - The `/api/products` route returns a list of all products, while the `/api/products/:id` route returns a single product by ID.
+    - The product data is likely to be used in the search results returned by the INPUT API.
+    - The implementation of this API can provide guidance on how to structure the product catalog data and expose it through an API.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product.js>
+    **Summary:** A product model with basic CRUD operations.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides a way to create, read, update, and delete products.
+    - The `Product` class has methods for creating a new product, retrieving a product by ID, updating a product, and deleting a product.
+    - The implementation of this model can provide guidance on how to store and manage product data in the INPUT API.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-repository.js>
+    **Summary:** A product repository that uses MongoDB to store and retrieve products.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides a way to store and retrieve product data from a database.
+    - The `ProductRepository` class has methods for creating a new product, retrieving a product by ID, updating a product, and deleting a product.
+    - The implementation of this repository uses MongoDB, which can be used to implement the data storage functionality in the INPUT API.
+    - The `ProductRepository` class can provide guidance on how to structure the database schema and implement CRUD operations using MongoDB.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-service.js>
+    **Summary:** A product service that provides business logic for managing products.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides business logic for managing products.
+    - The `ProductService` class has methods for creating a new product, updating a product, and deleting a product.
+    - The implementation of this service can provide guidance on how to implement business logic for managing products in the INPUT API.
+    - The `ProductService` class can also provide guidance on how to structure the API endpoints and handle errors.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-validation.js>
+    **Summary:** A product validation library for validating product data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides validation logic for product data.
+    - The `validateProduct` function checks that a product has a valid name, price, and stock level.
+    - The implementation of this validation library can provide guidance on how to validate product data in the INPUT API.
+    - The `validateProduct` function can be used as a reference for implementing validation logic for other input data in the INPUT API.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-transformer.js>
+    **Summary:** A product transformer library for converting product data between formats.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides logic for converting product data between formats.
+    - The `transformProductToApi` and `transformProductToDb` functions convert product data between an API format and a database format, respectively.
+    - The implementation of this transformer library can provide guidance on how to convert product data between formats in the INPUT API.
+    - The `transformProductToApi` function can be used as a reference for implementing logic for converting product data to a format suitable for the INPUT API.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-controller.js>
+    **Summary:** A product controller for handling HTTP requests related to products.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it handles HTTP requests related to products.
+    - The `ProductController` class has methods for handling GET, POST, PUT, and DELETE requests related to products.
+    - The implementation of this controller can provide guidance on how to structure the API endpoints and handle errors in the INPUT API.
+    - The `ProductController` class can also provide guidance on how to implement middleware functions for handling request validation and error handling.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-router.js>
+    **Summary:** A product router for handling HTTP requests related to products.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it handles HTTP requests related to products.
+    - The `ProductRouter` class sets up routes for handling GET, POST, PUT, and DELETE requests related to products.
+    - The implementation of this router can provide guidance on how to structure the API endpoints and handle errors in the INPUT API.
+    - The `ProductRouter` class can also provide guidance on how to use middleware functions for handling request validation and error handling.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-middleware.js>
+    **Summary:** A product middleware library for handling request validation and error handling.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides middleware functions for handling request validation and error handling.
+    - The `validateProductRequest` middleware function validates the request body for creating or updating a product.
+    - The `errorHandler` middleware function handles errors and returns a standard error response.
+    - The implementation of this middleware library can provide guidance on how to implement middleware functions for handling request validation and error handling in the INPUT API.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-error.js>
+    **Summary:** A product error library for defining custom error messages.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides a way to define custom error messages for product-related errors.
+    - The `ProductError` class extends the built-in `Error` class and provides custom error messages for product-related errors.
+    - The implementation of this error library can provide guidance on how to define custom error messages for other types of errors in the INPUT API.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-logger.js>
+    **Summary:** A product logger library for logging product-related events.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it provides a way to log product-related events.
+    - The `ProductLogger` class logs product-related events to a file or console.
+    - The implementation of this logger library can provide guidance on how to implement logging functionality for other types of events in the INPUT API.
+    ---
+
+    **Source:** <path/to/product-catalog/lib/product-config.js>
+    **Summary:** A product configuration file for setting up the product catalog API.
+    **
+
+### Response 15
+
+    ---
+    **Source:** <project_root>/api/v1/products/{id}
+    **Summary:** Fetches product details by its identifier.
+    **Implementation Guidance:**
+    - This API is directly related to the INPUT API functionality as it provides the ability to fetch product details by their identifier.
+    - The `/api/v1/products/{id}` endpoint accepts a product identifier as a path parameter and returns the product details in JSON format.
+    - The implementation uses the `ProductService` class to fetch the product details from the database using the provided product identifier.
+    - The `ProductService` class uses the `ProductRepository` interface to interact with the database.
+    - The `ProductRepository` interface defines methods for creating, updating, and fetching products from the database.
+    ---
+
+    **Source:** <project_root>/src/app/shared/services/product.service.ts
+    **Summary:** Provides methods for interacting with the product API.
+    **Implementation Guidance:**
+    - This service is related to the INPUT API functionality as it provides methods for interacting with the product API, including fetching product details.
+    - The `getProductById()` method uses the `HttpClient` to send a GET request to the `/api/v1/products/{id}` endpoint and returns the product details in JSON format.
+    - The `ProductService` also provides methods for creating, updating, and deleting products, which could be useful for future API features.
+    ---
+
+    **Source:** <project_root>/src/app/shared/models/product.model.ts
+    **Summary:** Defines the structure of a product object.
+    **Implementation Guidance:**
+    - This model is related to the INPUT API functionality as it defines the structure of a product object, which is used to return the product details in the API response.
+    - The `Product` interface includes properties for the product identifier, name, description, images, and specifications.
+    - The `Product` interface could be extended to include additional properties as needed for future API features.
+    ---
+
+    **Source:** <project_root>/src/app/shared/services/product.service.spec.ts
+    **Summary:** Contains unit tests for the product service.
+    **Implementation Guidance:**
+    - This file is related to the INPUT API functionality as it contains unit tests for the `ProductService`, which is used to interact with the product API.
+    - The tests cover various aspects of the `ProductService`, including fetching, creating, updating, and deleting products.
+    - The tests use the `HttpClientTestingModule` and `HttpHandler` to mock the HTTP requests and responses, allowing for controlled testing of the service methods.
+    ---
+
+    ### OPTIONAL EXTERNAL APIS
+
+    **Source:** <https://github.com/microsoft/playwright/blob/main/examples/python/e2e/products.py>
+    **Summary:** An example of testing product listing and details using Playwright.
+    **Implementation Guidance:**
+    - This example is optional and not directly related to the INPUT API functionality, but it could provide inspiration for testing the product API using a headless browser.
+    - The example uses Playwright, a Node.js library for automating Chromium and Firefox browsers, to test the product listing and details on a website.
+    - The implementation uses Playwright's `Page` class to navigate to the product listing page, search for a product, and click on its link to view the product details page.
+    - The implementation uses Playwright's `expect` function to assert that the product details match the expected values.
+    ---
+
+    **Source:** <https://github.com/prisma/prisma/tree/master/examples/ts-node/src/generated/prisma>
+    **Summary:** Generated Prisma client for interacting with a database.
+    **Implementation Guidance:**
+    - This example is optional and not directly related to the INPUT API functionality, but it could provide inspiration for using Prisma to interact with a database in the product API.
+    - The example uses Prisma, an open-source database toolkit, to generate a TypeScript client for interacting with a PostgreSQL database.
+    - The implementation defines a `Product` model with properties for the product identifier, name, description, images, and specifications.
+    - The implementation provides methods for creating, updating, and fetching products from the database using the generated client.
+    ---
+
+### Response 16
+
+    ---
+    **Source:** <project_path>/src/api/products/product.controller.ts
+    **Summary:** Handles HTTP requests related to products.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages product inventory levels.
+    - The `updateProductStock` function (lines 31-43) is responsible for updating the stock count of a product.
+    - The function accepts a `productId` and a `quantity` as arguments.
+    - It first retrieves the product from the database using the provided `productService`.
+    - If the product exists, it updates the stock count by adding or subtracting the provided quantity.
+    ---
+
+    **Source:** <project_path>/src/api/products/product.service.ts
+    **Summary:** Provides methods to interact with the product data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages product inventory levels.
+    - The `getProductById` function (lines 21-30) is used to retrieve a product from the database by its ID.
+    - The `updateProductStock` function (lines 33-43) is used to update the stock count of a product.
+    - Both functions are used in the `productController` to handle the HTTP requests related to product inventory updates.
+    ---
+
+    **Source:** <project_path>/src/api/products/product.model.ts
+    **Summary:** Defines the structure of a product document.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages product inventory levels.
+    - The `Product` interface (lines 3-12) defines the structure of a product document, including the `stock` property which represents the current stock count.
+    - The `ProductDocument` interface (lines 15-20) extends the `Product` interface and adds the `_id` property which is automatically generated by MongoDB when a new document is created.
+    ---
+
+    **Source:** <project_path>/src/api/products/product.routes.ts
+    **Summary:** Defines the routes for product-related HTTP requests.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API as it manages product inventory levels.
+    - The `productRoutes` variable (lines 11-21) defines the routes for product-related HTTP requests, including the `/products/:id` route which is used to update the stock count of a product.
+    - The `updateProductStock` function (lines 24-32) is used to handle the HTTP request to update the stock count of a product.
+    - It calls the `productController.updateProductStock` function to process the request and update the product's stock count in the database.
+
+### Response 17
+
+    ---
+    **Source:** <path/to/inventory/api/src/inventory.ts>
+    **Summary:** An inventory API that manages stock levels and handles reservations.
+    **Implementation Guidance:**
+    - This API is directly related to the INPUT API functionality as it manages the inventory stock levels and handles reservations.
+    - The `reserveItem` function (line 33) is particularly relevant. It accepts an item ID and a quantity, and it temporarily decreases the stock level by that quantity while also setting a reservation expiry time.
+    - The `confirmReservation` function (line 43) is used to confirm a reservation, which will decrease the stock level permanently and release the reservation.
+    ---
+
+    **Source:** <path/to/order/api/src/order.ts>
+    **Summary:** An order API that manages orders and their associated inventory reservations.
+    **Implementation Guidance:**
+    - This API is related to the INPUT API functionality as it manages orders and their associated inventory reservations.
+    - The `createOrder` function (line 25) accepts an order object and creates a new order, also reserving the required inventory using the inventory API.
+    - The `confirmOrder` function (line 38) is used to confirm an order, which will decrease the inventory stock level permanently and release any reservations.
+    ---
+
+    **Source:** <path/to/auth/api/src/auth.ts>
+    **Summary:** An authentication API that handles user registration and authentication.
+    **Implementation Guidance:**
+    - This API is not directly related to the INPUT API functionality, but it may be useful for implementing user registration and authentication for the INPUT API.
+    - The `registerUser` function (line 22) is used to register a new user, and it creates a new user document in the database.
+    - The `authenticateUser` function (line 35) is used to authenticate a user by checking their credentials against the database.
+    ---
+
+### Response 18
+
+    ---
+    **Source:** <path/to/payment-gateway/src/payment-gateway.ts>
+    **Summary:** A payment gateway interface and its implementation for processing payments.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it handles payment processing.
+    - The `PaymentGateway` interface defines the contract for processing payments, including the `charge` method.
+    - The `StripePaymentGateway` class implements the `PaymentGateway` interface using Stripe API.
+    - The `charge` method accepts an order object and returns a payment transaction record.
+    ---
+
+    **Source:** <path/to/order-service/src/order.ts>
+    **Summary:** An order service with methods for creating, retrieving, and updating orders.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it manages orders.
+    - The `Order` class represents an order with properties like `id`, `amount`, and `paymentTransaction`.
+    - The `OrderService` class provides methods for creating, retrieving, and updating orders.
+    - The `createOrder` method accepts a payment method token and returns a new order object with a payment transaction record.
+    ---
+
+    **Source:** <path/to/payment-transaction/src/payment-transaction.ts>
+    **Summary:** A payment transaction model with methods for creating and retrieving payment transactions.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it manages payment transactions.
+    - The `PaymentTransaction` class represents a payment transaction with properties like `id`, `amount`, and `status`.
+    - The `PaymentTransactionService` class provides methods for creating and retrieving payment transactions.
+    - The `createPaymentTransaction` method accepts an order object and returns a new payment transaction object.
+    ---
+
+    **Optional External APIs**
+
+    **Source:** <https://github.com/stripe/stripe-node>
+    **Summary:** Stripe Node.js library for integrating Stripe API into Node.js applications.
+    **Implementation Guidance:**
+    - This code is an optional external API that can be used for inspiration when implementing the StripePaymentGateway class.
+    - The library provides methods for charging credit cards, managing subscriptions, and handling refunds.
+    - The `charge.create` method can be used to create a payment charge.
+    - The `Subscription` class can be used to manage recurring payments.
+    ---
+
+    **Source:** <https://github.com/mikejolley/node-stripe>
+    **Summary:** A lightweight Stripe wrapper for Node.js.
+    **Implementation Guidance:**
+    - This code is an optional external API that can be used for inspiration when implementing the StripePaymentGateway class.
+    - The library provides methods for charging credit cards, managing subscriptions, and handling refunds.
+    - The `charge.create` method can be used to create a payment charge.
+    - The `Subscription` class can be used to manage recurring payments.
+    ---
+
+    **Source:** <https://github.com/paypal/checkout-server-sdk-nodejs>
+    **Summary:** PayPal Checkout Server SDK for Node.js.
+    **Implementation Guidance:**
+    - This code is an optional external API that can be used for inspiration when implementing a payment gateway for PayPal.
+    - The library provides methods for creating orders, managing transactions, and handling refunds.
+    - The `order.create` method can be used to create a new order.
+    - The `payment.create` method can be used to capture a payment.
+    ---
+
+### Response 19
+
+    ---
+    **Source:** <project_root>/src/api/v1/payments/refunds.js
+    **Summary:** Handles payment refunds.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality, as it handles the refund process.
+    - The `refundPayment` function (lines 11-33) accepts a payment ID and initiates a refund, returning a refund transaction ID and updated payment status.
+    - The `createRefundTransaction` function (lines 36-51) creates a new refund transaction in the database.
+    ---
+
+    **Source:** <project_root>/src/api/v1/payments/middlewares/auth.js
+    **Summary:** Authenticates incoming payment requests.
+    **Implementation Guidance:**
+    - This middleware is not directly related to the refund functionality, but it is required for all payment-related API endpoints, including the refund endpoint.
+    - The `authenticatePaymentRequest` function (lines 11-23) checks the request headers for a valid API key and user ID.
+    ---
+
+    **Source:** <project_root>/src/api/v1/payments/middlewares/validation.js
+    **Summary:** Validates incoming payment requests.
+    **Implementation Guidance:**
+    - This middleware is not directly related to the refund functionality, but it is required for all payment-related API endpoints, including the refund endpoint.
+    - The `validatePaymentRequest` function (lines 11-23) checks that the request body contains the required fields (payment ID and reason for refund).
+    ---
+
+    **Source:** <project_root>/src/api/v1/payments/services/paymentService.js
+    **Summary:** Provides payment-related functionality.
+    **Implementation Guidance:**
+    - This service is not directly related to the refund functionality, but it is used by the refund endpoint to retrieve payment details.
+    - The `getPaymentById` function (lines 11-23) retrieves a payment from the database by its ID.
+    ---
+
+    **Source:** <project_root>/src/api/v1/payments/services/refundService.js
+    **Summary:** Provides refund-related functionality.
+    **Implementation Guidance:**
+    - This service is directly related to the refund functionality, as it handles the logic for creating a refund transaction and updating the payment status.
+    - The `createRefundTransaction` function (lines 11-23) creates a new refund transaction in the database and updates the payment status.
+    - The `refundPayment` function (lines 26-43) initiates a refund by calling the `createRefundTransaction` function and returning the refund transaction ID and updated payment status.
+    ---
+
+    **Source:** <project_root>/src/api/v1/payments/models/paymentModel.js
+    **Summary:** Defines the payment schema.
+    **Implementation Guidance:**
+    - This model is used by the database to store payment information, including refund transactions.
+    - The `refundTransaction` property (line 11) is an embedded document that stores refund transaction details.
+    ---
+
+    **Source:** <project_root>/src/api/v1/payments/models/refundModel.js
+    **Summary:** Defines the refund schema.
+    **Implementation Guidance:**
+    - This model is used by the database to store refund transaction information.
+    - The `paymentId` property (line 11) is a reference to the associated payment document.
+    ---
+
+    **Optional External APIs:**
+    - You may use external APIs as optional inspiration only.
+    - Do not assume they are installed or imported.
+    - Do not include code examples from external APIs.
+
+    **Example:**
+
+    **Source:** <https://github.com/stripe/stripe-node/blob/master/lib/refunds.js>
+    **Summary:** Handles Stripe refunds.
+    **Implementation Guidance:**
+    - This code is not directly related to the INPUT API functionality, as it uses the Stripe API to handle refunds.
+    - The `refunds.create` function (lines 11-23) creates a new refund transaction using the Stripe API.
+    - To use this code in the INPUT API, you would need to install the Stripe Node library and configure it with your Stripe API key.
+
+### Response 20
+
+    ---
+    **Source:** <project_root>/api/v1/orders/<order_id>/shipments
+    **Summary:** Endpoint for creating a new shipment for a specific order.
+    **Implementation Guidance:**
+    - This API is directly related to the INPUT API functionality, as it handles the creation of a new shipment for a confirmed order.
+    - The `POST /api/v1/orders/{order_id}/shipments` route accepts a JSON body containing the courier service and shipping address details.
+    - The `create_shipment` function in `shipments.py` is responsible for processing the request, creating a new shipment record, and assigning a courier service based on the provided data.
+    - The `Shipment` model in `models.py` represents the shipment data, including the order association, courier service, and tracking information.
+    ---
+
+    **Source:** <project_root>/api/v1/couriers
+    **Summary:** Endpoint for retrieving a list of available courier services.
+    **Implementation Guidance:**
+    - This API can be used to retrieve a list of available courier services for the INPUT API's shipment creation functionality.
+    - The `GET /api/v1/couriers` route returns a JSON array of courier service objects, including their names and IDs.
+    - The `Courier` model in `models.py` represents the courier service data, including the name and any relevant configuration options.
+    ---
+
+    **Source:** <project_root>/api/v1/shipping_addresses
+    **Summary:** Endpoint for creating and retrieving shipping addresses.
+    **Implementation Guidance:**
+    - This API can be used to create and retrieve shipping addresses for the INPUT API's shipment creation functionality.
+    - The `POST /api/v1/shipping_addresses` route accepts a JSON body containing the address details.
+    - The `create_shipping_address` function in `shipping_addresses.py` is responsible for processing the request, creating a new shipping address record, and returning the address details.
+    - The `ShippingAddress` model in `models.py` represents the shipping address data, including the user association and address lines.
+    ---
+
+    **Source:** <project_root>/api/v1/couriers/{courier_id}/rates
+    **Summary:** Endpoint for retrieving shipping rates from a specific courier service.
+    **Implementation Guidance:**
+    - This API can be used to retrieve shipping rates from a specific courier service for the INPUT API's shipment creation functionality.
+    - The `GET /api/v1/couriers/{courier_id}/rates` route accepts a courier ID and returns a JSON object containing the shipping rates based on the shipping address and package size/weight.
+    - The `get_rates` function in `rates.py` is responsible for processing the request, querying the courier service for rates, and returning the results.
+    - The `Rate` model in `models.py` represents the shipping rate data, including the courier service association, shipping address, package size/weight, and cost.
+    ---
+
+    **Source:** <project_root>/api/v1/couriers/{courier_id}/statuses
+    **Summary:** Endpoint for retrieving the current status of a specific courier service.
+    **Implementation Guidance:**
+    - This API can be used to check the current status of a specific courier service for the INPUT API's shipment creation functionality.
+    - The `GET /api/v1/couriers/{courier_id}/statuses` route returns a JSON object containing the current status of the courier service, such as "available", "busy", or "offline".
+    - The `get_courier_status` function in `statuses.py` is responsible for processing the request and returning the current status of the specified courier service.
+    ---
+
+    **Source:** <project_root>/api/v1/shipments/{shipment_id}/tracking
+    **Summary:** Endpoint for retrieving the tracking information for a specific shipment.
+    **Implementation Guidance:**
+    - This API can be used to retrieve the tracking information for a specific shipment after it has been created.
+    - The `GET /api/v1/shipments/{shipment_id}/tracking` route returns a JSON object containing the tracking number and carrier website URL for tracking the shipment.
+    - The `get_shipment_tracking` function in `tracking.py` is responsible for processing the request, querying the courier service for tracking information, and returning the results.
+    ---
+
+    **Optional External APIs:**
+    - You may use external APIs as inspiration only, but do not assume they are installed or imported.
+    - Provide specific implementation guidance if applicable.
+
+    ---
+
+    **Source:** <https://github.com/postmates/postmates-python-api>
+    **Summary:** Postmates API for managing on-demand delivery and logistics services.
+    **Implementation Guidance:**
+    - This external API could be used as inspiration for implementing real-time tracking and courier service integration in the INPUT API.
+    - The Postmates API provides endpoints for creating shipments, retrieving tracking information, and managing courier services.
+    - To use this API, you would need to install the `postmates` Python package and obtain an API key.
+    - The `create_shipment` function in `shipments.py` could be modified to use the Postmates API for creating and tracking shipments, but this would require additional development effort and potentially increased costs.
+    ---
+
+    **Source:** <https://github.com/stripe/stripe-python>
+    **Summary:** Stripe API for managing payments and subscriptions.
+    **Implementation Guidance:**
+    - This external API could be used as inspiration for implementing payment processing and subscription management in the INPUT API.
+    - The Stripe API provides endpoints for creating charges, managing subscriptions, and handling refunds.
+    - To use this API, you would need to install the `stripe` Python package and obtain an API key.
+    - The `create_charge` function in `charges.py` could be modified to use the Stripe API for processing payments, but this would require additional development effort and potentially increased costs.
+    ---
+
+    **Source:** <https://github.com/googlemaps/google-maps-services-python>
+    **Summary:** Google Maps API for geocoding, directions, and places.
+    **Implementation Guidance:**
+    - This external API could be used as inspiration for implementing address validation and geocoding in the INPUT API.
+    - The Google Maps API provides endpoints for geocoding addresses, calculating directions, and searching for places.
+    - To use this API, you would need to install the `googlemaps` Python package and obtain an API key.
+    - The `geocode_address` function in `geocoding.py` could be modified to use the Google Maps API for geocoding addresses, but this would require additional development effort and potentially increased costs.
+
+### Response 21
+
+    ---
+    **Source:** <project_root>/api/shipments/shipment.py
+    **Summary:** Handles shipment-related requests, including retrieving shipment status.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it handles shipment-related requests and includes a function to retrieve shipment status.
+    - The `get_shipment` function (lines 21-38) retrieves a shipment object based on the provided shipment identifier.
+    - The `get_shipment_status` function (lines 41-51) retrieves the current status of the shipment and the estimated arrival time.
+    ---
+
+    **Source:** <project_root>/api/shipments/shipment_status.py
+    **Summary:** Defines the ShipmentStatus model and related methods.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines the ShipmentStatus model, which is used to represent the current status of a shipment.
+    - The `get_status_display` method (lines 11-17) returns a user-friendly string representation of the shipment status.
+    ---
+
+    **Source:** <project_root>/api/shipments/shipment_serializers.py
+    **Summary:** Defines serializers for shipment-related data.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines serializers for shipment data, which are used to convert between Python data structures and JSON format for API responses.
+    - The `ShipmentSerializer` class (lines 11-23) serializes a shipment object to JSON format.
+    - The `ShipmentStatusSerializer` class (lines 26-33) serializes a shipment status object to JSON format.
+    ---
+
+    **Source:** <project_root>/api/shipments/shipment_views.py
+    **Summary:** Defines views for shipment-related requests.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines views for handling shipment-related requests, including retrieving shipment status.
+    - The `get_shipment_status` view function (lines 11-21) uses the `get_shipment` and `get_shipment_status` functions from the `shipment` module to retrieve the shipment status and returns it as a JSON response.
+
+### Response 22
+
+    ---
+    **Source:** <path/to/project>/src/api/v1/notifications/index.js
+    **Summary:** Handles incoming notifications requests and dispatches email or SMS notifications.
+    **Implementation Guidance:**
+    - This code is the primary entry point for the notifications feature.
+    - It uses the `sendNotification` function to process incoming requests and dispatch notifications.
+    - The `sendNotification` function checks the notification type (email or SMS) and uses the corresponding service (`mailer` or `sms`) to send the notification.
+    - The `mailer` and `sms` services are imported from separate modules (`mailer.js` and `sms.js`).
+    - The `sendNotification` function returns a notification log entry, which can be used for tracking and auditing purposes.
+
+    ---
+    **Source:** <path/to/project>/src/api/v1/notifications/mailer.js
+    **Summary:** Handles email notifications.
+    **Implementation Guidance:**
+    - This code uses the `nodemailer` library to send email notifications.
+    - It defines a `transporter` object, which is used to send emails.
+    - The `sendMail` function is used to send an email using the `transporter` object.
+    - The `sendNotification` function in `index.js` imports and uses this module to send email notifications.
+
+    ---
+    **Source:** <path/to/project>/src/api/v1/notifications/sms.js
+    **Summary:** Handles SMS notifications.
+    **Implementation Guidance:**
+    - This code uses the `twilio` library to send SMS notifications.
+    - It defines a `client` object, which is used to send SMS messages.
+    - The `sendSMS` function is used to send an SMS message using the `client` object.
+    - The `sendNotification` function in `index.js` imports and uses this module to send SMS notifications.
+    
+    ---
+    **Source:** <path/to/project>/src/api/v1/users/index.js
+    **Summary:** Handles user registration and authentication requests.
+    **Implementation Guidance:**
+    - This code uses the `jsonwebtoken` library for user authentication and token generation.
+    - It defines routes for user registration and authentication.
+    - The `register` route handles new user registration and creates a new user entry in the database.
+    - The `login` route authenticates a user and returns a JSON Web Token (JWT) for authentication.
+    - The `sendNotification` function in `notifications/index.js` can use this module to associate notifications with specific users based on their email or phone number.
+    
+    ---
+    **Source:** <path/to/project>/src/api/v1/db/index.js
+    **Summary:** Handles database connections and queries.
+    **Implementation Guidance:**
+    - This code uses the `pg` library for database connections and queries.
+    - It defines a `pool` object, which is used to establish and manage database connections.
+    - The `query` function is used to execute SQL queries against the database.
+    - The `sendNotification` function in `notifications/index.js` can use this module to query the database for user information (email or phone number) to send notifications to specific users.
+
+### Response 23
+
+    ---
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/api/v1/webhooks/index.ts>
+    **Summary:** Handles incoming webhook events and updates the database accordingly.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it handles webhook events, which is a key component of the INPUT API.
+    - The `handleWebhookEvent` function processes incoming webhook events and updates the database using the `updateEvent` function.
+    - The `updateEvent` function takes an event object and updates the corresponding record in the database using the provided `eventType` and `data`.
+    ---
+
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/api/v1/webhooks/middleware.ts>
+    **Summary:** Middleware function to validate and handle webhook signatures.
+    **Implementation Guidance:**
+    - This middleware function is used to validate incoming webhook signatures and ensure that the requests are genuine.
+    - The `validateWebhookSignature` function checks the request headers against the expected values and returns a boolean indicating whether the request is valid.
+    - If the request is valid, the `handleWebhookEvent` function is called to process the event.
+    ---
+
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/api/v1/webhooks/routes.ts>
+    **Summary:** Defines the routes for handling webhook events.
+    **Implementation Guidance:**
+    - This file defines the routes for handling incoming webhook events.
+    - The `/webhooks` route is defined as a POST route, which is where incoming webhook events will be sent.
+    - The `app.use('/webhooks', webhooksRouter)` line imports and registers the webhooks router, making it available at the defined route.
+    ---
+
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/api/v1/webhooks/schemas.ts>
+    **Summary:** Defines the schema for incoming webhook events.
+    **Implementation Guidance:**
+    - This file defines the schema for incoming webhook events using the `zod` library.
+    - The `WebhookEvent` object defines the expected structure of incoming webhook events, including the `eventType` and `data` properties.
+    - This schema is used to validate incoming webhook events and ensure that they have the expected format.
+    ---
+
+    **Source:** <https://github.com/your-company/your-project/blob/main/src/api/v1/webhooks/utils.ts>
+    **Summary:** Utility functions for handling webhook events.
+    **Implementation Guidance:**
+    - This file contains utility functions for handling webhook events, including `getEventType` and `getEventData`.
+    - The `getEventType` function extracts the event type from the incoming request headers.
+    - The `getEventData` function extracts the event data from the incoming request body, using the defined schema to validate the data.
+    ---
+
+    ### OPTIONAL EXTERNAL APIS
+
+    **Source:** <https://github.com/prisma/prisma/tree/master/packages/prisma-client-node>
+    **Summary:** Prisma client for Node.js, used for database operations.
+    **Implementation Guidance:**
+    - This library could be used to implement the database operations in the INPUT API.
+    - The `PrismaClient` class can be used to define and execute database queries.
+    - Specific functions, such as `createEvent` and `updateEvent`, could be used to create and update records in the database.
+    ---
+
+    **Source:** <https://github.com/nats-io/nats>
+    **Summary:** NATS messaging server and client library.
+    **Implementation Guidance:**
+    - This library could be used to implement a message-driven architecture for the INPUT API.
+    - The NATS server can be used to publish and subscribe to messages, allowing for real-time communication between components.
+    - The NATS client library can be used to interact with the NATS server from within the INPUT API code.
+    ---
+
+    **Source:** <https://github.com/expressjs/express>
+    **Summary:** Minimal and flexible Node.js web application framework.
+    **Implementation Guidance:**
+    - This library could be used to build the INPUT API server.
+    - Express provides a robust set of features for building web applications, including routing, middleware, and request handling.
+    - The INPUT API could be built using Express, with routes defined for handling webhook events and other API requests.
+
+### Response 24
+
+    ---
+    **Source:** <path/to/project>/src/domain/order/event/OrderCompletedEvent.php
+    **Summary:** An event class for the "order.completed" event.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality, as it represents the event that will be emitted when an order is completed.
+    - The `OrderCompletedEvent` class extends the `DomainEvent` abstract class, which is defined in `src/domain/DomainEvent.php`. This class provides common functionality for all domain events, such as a unique identifier and a timestamp.
+    - The `OrderCompletedEvent` class has a constructor that accepts an `Order` object as an argument. This `Order` object will contain the state of the order when it was completed.
+    - The `OrderCompletedEvent` class has a `getOrder()` method, which returns the `Order` object associated with the event.
+    ---
+
+    **Source:** <path/to/project>/src/application/EventSubscriber/OrderSubscriber.php
+    **Summary:** An event subscriber that listens for the "order.completed" event and performs some action.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it is responsible for handling the "order.completed" event and notifying other microservices of the change in state.
+    - The `OrderSubscriber` class implements the `EventSubscriberInterface` interface, which is defined in `symfony/Component/EventDispatcher/EventSubscriberInterface.php`. This interface is required for any class that wants to be registered as an event subscriber.
+    - The `OrderSubscriber` class has a static `getSubscribedEvents()` method, which returns an array of event names that the subscriber listens to. In this case, it only listens to the "order.completed" event.
+    - The `OrderSubscriber` class has a `handleOrderCompletedEvent()` method, which is called when the "order.completed" event is dispatched. This method is responsible for notifying other microservices of the change in state.
+    - The `handleOrderCompletedEvent()` method uses the `EventDispatcherInterface` to dispatch an event of its own, which will be handled by the other microservices. The name of this event will depend on the specific functionality of the other microservices.
+    ---
+
+    **Source:** <path/to/project>/src/config/services.yaml
+    **Summary:** Configuration file for registering services, including the event subscriber.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it is responsible for registering the `OrderSubscriber` class as a service and an event subscriber.
+    - The `services.yaml` file uses the `services` key to define a list of services. Each service is defined as an associative array with a unique name as the key and the service class as the value.
+    - The `services.yaml` file defines the `App\Application\EventSubscriber\OrderSubscriber` service, which is registered as a service and an event subscriber.
+    - The `services.yaml` file also defines the `App\Application\EventDispatcher\EventDispatcher` service, which is used by the `OrderSubscriber` class to dispatch events. This service is automatically registered by Symfony.
+    ---
+
+    **Source:** <path/to/project>/src/domain/order/Order.php
+    **Summary:** The `Order` class, which represents an order in the system.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it is the entity that represents an order and will be passed to the `OrderCompletedEvent` when an order is completed.
+    - The `Order` class has various properties and methods related to order management, such as `getStatus()`, `setStatus()`, and `getTotal()`.
+    - The `Order` class has an `__toString()` method, which is called when the order is printed or echoed. This method returns the order number and the current status of the order, making it easier to read and understand when working with orders.
+    ---
+
+    **Source:** <path/to/project>/src/domain/DomainEvent.php
+    **Summary:** An abstract class for domain events, providing common functionality.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it is the base class for all domain events, including the `OrderCompletedEvent`.
+    - The `DomainEvent` abstract class provides common functionality for all domain events, such as a unique identifier and a timestamp.
+    - The `DomainEvent` abstract class has a constructor that accepts an array of metadata as an argument. This metadata can be used to store additional information about the event.
+    - The `DomainEvent` abstract class has a `getUuid()` method, which returns the unique identifier for the event. This identifier is generated using the `uuid_create()` function from the `ext-uuid` extension in PHP.
+    - The `DomainEvent` abstract class has a `getCreatedAt()` method, which returns the timestamp when the event was created. This timestamp is set when the event is instantiated.
+    ---
+
+    **Source:** <path/to/project>/src/domain/order/event/EventBus.php
+    **Summary:** A simple event bus for dispatching domain events.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it is responsible for dispatching domain events, including the `OrderCompletedEvent`.
+    - The `EventBus` class is a simple implementation of the event bus pattern, which allows decoupling the sender of a message from the receiver.
+    - The `EventBus` class has a `dispatch()` method, which accepts a domain event as an argument and dispatches it to all registered event listeners.
+    - The `EventBus` class uses an array called `$listeners` to store the event listeners. Each listener is an associative array with the event name as the key and the listener callable as the value.
+    - The `EventBus` class uses the `spl_object_hash()` function to generate a unique identifier for each event listener, which is used as the key in the `$listeners` array.
+    ---
+
+    **Source:** <path/to/project>/src/application/EventSubscriber/EventDispatcherSubscriber.php
+    **Summary:** An event subscriber that listens for the "event.dispatched" event and logs the event.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it is an example of an event subscriber that listens for a specific event and performs some action.
+    - The `EventDispatcherSubscriber` class implements the `EventSubscriberInterface` interface and has a static `getSubscribedEvents()` method that returns an array containing the event name to listen for ("event.dispatched").
+    - The `EventDispatcherSubscriber` class has a `handleEventDispatchedEvent()` method that is called when the "event.dispatched" event is dispatched.
+    - The `handleEventDispatchedEvent()` method logs the event name, the event instance, and the timestamp using the `Monolog` logging library.
+    ---
+
+    **Source:** <path/to/project>/src/config/packages/monolog.yaml
+    **Summary:** Configuration file for the Monolog logging library.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it is used by the `EventDispatcherSubscriber` to configure the Monolog logging library.
+    - The `monolog.yaml` file defines the logging configuration for the application, including the handlers, processors, and log channels.
+    - The `monolog.yaml` file defines a `main` logging channel that is used by default, and a `console` handler that writes log messages to the console.
+    - The `monolog.yaml` file defines a `access_log` logging channel and a `file` handler that writes log messages to a file named `app.log`. This channel and handler are not used by the `EventDispatcherSubscriber`.
+    ---
+
+    **Source:** <path/to/project>/src/Application/EventSubscriber/EventSubscriberTrait.php
+    **Summary:** A trait providing common functionality for event subscribers.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality, as it is a trait that provides common functionality for event subscribers, including the `getSubscribedEvents()` method.
+    - The `EventSubscriberTrait` trait defines a `getSubscribedEvents()` method that returns an empty array by default, but can be overridden by child classes to return the specific events they listen for.
+    - The `EventSubscriberTrait` trait also defines a `__construct()` method that sets up the event dispatcher and the event subscriber instance, making
+
+### Response 25
+
+    ---
+    **Source:** <path/to/project>/services/metrics/metrics.go
+    **Summary:** A Go package for collecting and reporting microservice metrics.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it provides the ability to collect and report key performance indicators for a specific microservice.
+    - The `metrics.NewMicroservice` function can be used to create a new metrics reporter for a specific microservice.
+    - The `HandleRequest` function in the `metrics.Handler` struct can be used to wrap an existing handler function and automatically record request metrics.
+    - The `metrics.Report` function can be used to manually report custom metrics.
+    ---
+
+    **Source:** <path/to/project>/services/metrics/metrics.sql
+    **Summary:** A SQL script for creating and managing a metrics database schema.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it creates and manages the database schema for storing microservice metrics.
+    - The `CREATE TABLE` statements define the schema for storing request metrics, including request count, error rate, and latency percentiles.
+    - The `INSERT INTO` statements provide example data for initializing the metrics database.
+    ---
+
+    **Source:** <path/to/project>/services/metrics/metrics.yaml
+    **Summary:** A YAML configuration file for customizing the metrics reporter.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it allows for customizing the behavior of the metrics reporter.
+    - The `reporters` field can be used to configure which reporters are used to send metrics data to various destinations, such as a database or a third-party monitoring service.
+    - The `database` reporter is already configured to use the metrics database created by the SQL script.
+    ---
+
+    **Source:** <path/to/project>/services/metrics/metrics.go:metrics.go:handleRequest
+    **Summary:** A Go function for handling incoming requests and recording metrics.
+    **Implementation Guidance:**
+    - This function is used to handle incoming requests and record metrics for each request.
+    - It uses the `metrics.HandleRequest` function to wrap the existing handler function and automatically record request metrics.
+    - The `next` function is used to pass the request on to the next handler in the chain.
+    ---
+
+    **Source:** <path/to/project>/services/metrics/metrics.go:metrics.go:report
+    **Summary:** A Go function for manually reporting custom metrics.
+    **Implementation Guidance:**
+    - This function can be used to manually report custom metrics that are not automatically recorded by the `metrics.HandleRequest` function.
+    - It takes a metric name, metric type, and metric value as arguments.
+    - The `metrics.Report` function uses the configured reporters to send the metric data to the appropriate destinations.
+    ---
+
+### Response 26
+
+    ---
+    **Source:** <project_root>/src/api/v1/healthcheck.ts
+    **Summary:** Health check API endpoint that returns a JSON response with status and uptime information.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it provides a health check endpoint.
+    - The `healthcheckController.ts` file exports a single route handler function `healthcheck` that returns a JSON response with the status and uptime information.
+    - The `healthcheck.ts` file sets up the route for the health check endpoint using the Express framework.
+    - The `express.json()` middleware is used to parse incoming JSON data.
+    - The `res.json()` function is used to send a JSON response.
+    - The `process.uptime()` function is used to get the process uptime in seconds.
+    ---
+
+    **Source:** <project_root>/src/api/v1/middleware/error.ts
+    **Summary:** Middleware function to handle errors and return appropriate error messages.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it handles errors and returns appropriate error messages.
+    - The `errorMiddleware.ts` file exports a single middleware function `errorHandler` that catches errors and sends a JSON response with an error message.
+    - The middleware function uses the `next` argument to pass control to the next middleware function in the stack if no error is present.
+    - The `res.status()` function is used to set the HTTP status code.
+    - The `res.json()` function is used to send a JSON response with an error message.
+    ---
+
+    **Source:** <project_root>/src/api/v1/middleware/logger.ts
+    **Summary:** Middleware function to log incoming requests and responses.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it logs incoming requests and responses for debugging and monitoring purposes.
+    - The `loggerMiddleware.ts` file exports a single middleware function `logger` that logs the request and response data using the `winston` library.
+    - The middleware function uses the `next` argument to pass control to the next middleware function in the stack if logging is not required.
+    - The `req.method` and `req.url` properties are used to get the request method and URL.
+    - The `next` function is called with the request and response objects as arguments to pass control to the next middleware function in the stack.
+    ---
+
+    **Source:** <project_root>/src/api/v1/middleware/auth.ts
+    **Summary:** Middleware function to authenticate incoming requests using JWT tokens.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it authenticates incoming requests using JWT tokens.
+    - The `authMiddleware.ts` file exports a single middleware function `auth` that verifies the presence and validity of a JWT token in the request header.
+    - The middleware function uses the `jsonwebtoken` library to decode and verify the JWT token.
+    - The `next` function is called with the request and response objects as arguments and the decoded token as an additional argument to pass control to the next middleware function in the stack if authentication is successful.
+    - The middleware function sends a JSON response with an error message if authentication fails.
+    ---
+
+    **Source:** <project_root>/src/api/v1/middleware/validation.ts
+    **Summary:** Middleware function to validate incoming request data using Joi.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it validates incoming request data using Joi.
+    - The `validationMiddleware.ts` file exports a single middleware function `validate` that uses Joi to validate the request data.
+    - The middleware function uses the `joi.validate()` function to validate the request data against a Joi schema.
+    - The `next` function is called with the request and response objects as arguments and the validated data as an additional argument to pass control to the next middleware function in the stack if validation is successful.
+    - The middleware function sends a JSON response with an error message if validation fails.
+    ---
+
+    **Source:** <project_root>/src/api/v1/controllers/users.ts
+    **Summary:** User registration and authentication controller.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it handles user registration and authentication.
+    - The `usersController.ts` file exports several route handler functions for user registration and authentication.
+    - The `register` function handles user registration by creating a new user document in the MongoDB database and sending a JSON response with a JWT token.
+    - The `login` function handles user authentication by verifying the provided credentials and sending a JSON response with a JWT token.
+    - The `getUser` function handles user profile retrieval by fetching the user document from the MongoDB database and sending a JSON response.
+    - The `updateUser` function handles user profile update by updating the user document in the MongoDB database and sending a JSON response.
+    - The `deleteUser` function handles user deletion by removing the user document from the MongoDB database and sending a JSON response.
+    ---
+
+    **Source:** <project_root>/src/api/v1/models/user.ts
+    **Summary:** User model definition for MongoDB.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines the structure of user documents in the MongoDB database.
+    - The `user.ts` file exports a Mongoose schema for user documents that includes fields for the username, email, password hash, and creation and modification timestamps.
+    - The schema uses the `mongoose.Schema.Types` module to define the data types for each field.
+    - The `User` constructor is used to create new user documents based on the schema.
+    ---
+
+    **Source:** <project_root>/src/api/v1/config/db.ts
+    **Summary:** Database configuration file for MongoDB.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it configures the connection to the MongoDB database.
+    - The `db.ts` file exports a Mongoose connection object that is used throughout the application to interact with the database.
+    - The `mongoose.connect()` function is used to establish a connection to the MongoDB database using the provided configuration options.
+    - The `mongoose.connection.on()` event listener is used to handle connection errors and disconnections.
+    ---
+
+    **Source:** <project_root>/src/api/v1/config/jwt.ts
+    **Summary:** JWT token configuration file.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it configures the JWT tokens used for user authentication.
+    - The `jwt.ts` file exports a JWT signing configuration object that is used by the `jsonwebtoken` library to sign and verify JWT tokens.
+    - The configuration object includes options for the secret key, token expiration time, and token issuer.
+    ---
+
+    **Source:** <project_root>/src/api/v1/config/express.ts
+    **Summary:** Express configuration file.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it sets up the Express framework and configures middleware and routes.
+    - The `express.ts` file exports an Express application instance that is used throughout the application to handle incoming requests and send responses.
+    - The `app.use()` function is used to register middleware functions for error handling, logging, authentication, and validation.
+    - The `app.use()` function is also used to register route handlers for different endpoints.
+    - The `app.listen()` function is used to start the Express application and listen for incoming requests on a specified port.
+    ---
+
+    **Source:** <project_root>/src/api/v1/index.ts
+    **Summary:** Entry point for the API application.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it initializes the Express application and starts the server.
+    - The `index.ts` file imports the Express application instance and sets up the middleware and routes.
+    - The `app.listen()` function is used to start the Express application and listen for incoming requests on a specified port.
+    ---
+
+### Response 27
+
+    ---
+    **Source:** <project_path>/api/v1/reports/generate.py
+    **Summary:** Generates a report based on a given date range and returns the report data.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it generates reports based on a given date range.
+    - The `generate_report` function takes a `start_date` and `end_date` as arguments and returns the report data.
+    - The `generate_report` function uses the `ReportService` class to fetch the report data from the database.
+    - The `ReportService` class uses the `ReportRepository` class to interact with the database.
+    - The `generate_report` function returns the report data as a JSON response.
+
+    ---
+    **Source:** <project_path>/api/v1/jobs/create.py
+    **Summary:** Creates a new job and returns the job ID.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it creates an asynchronous job to generate a report.
+    - The `create_job` function takes a `job_type` argument (in this case, 'report_generation') and returns the job ID.
+    - The `create_job` function uses the `JobService` class to create a new job and save it to the database.
+    - The `JobService` class uses the `JobRepository` class to interact with the database.
+    - The `create_job` function returns the job ID as a JSON response.
+
+    ---
+    **Source:** <project_path>/api/v1/jobs/status.py
+    **Summary:** Retrieves the status of a given job.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it allows checking the status of a report generation job.
+    - The `get_job_status` function takes a `job_id` as an argument and returns the job status.
+    - The `get_job_status` function uses the `JobService` class to retrieve the job status from the database.
+    - The `JobService` class uses the `JobRepository` class to interact with the database.
+    - The `get_job_status` function returns the job status as a JSON response.
+
+    ---
+    **Source:** <project_path>/api/v1/jobs/cancel.py
+    **Summary:** Cancels a given job.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it allows canceling a report generation job.
+    - The `cancel_job` function takes a `job_id` as an argument and returns a boolean value indicating whether the job was successfully canceled.
+    - The `cancel_job` function uses the `JobService` class to update the job status in the database and send a cancellation signal to the report generation process.
+    - The `JobService` class uses the `JobRepository` class to interact with the database.
+    - The `cancel_job` function returns a boolean value as a JSON response.
+
+    ---
+    **Source:** <project_path>/api/v1/reports/__init__.py
+    **Summary:** Defines the Report API blueprint.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines the endpoints for generating and checking the status of reports.
+    - The `generate_report_blueprint` blueprint includes the `generate_report` and `get_job_status` endpoints.
+    - The `generate_report` endpoint uses the `create_job` function to create a new report generation job and returns the job ID.
+    - The `get_job_status` endpoint uses the `get_job_status` function to retrieve the status of a given report generation job.
+    - The `cancel_job` endpoint is not directly related to the INPUT API functionality but is included for completeness.
+
+    ---
+    **Source:** <project_path>/api/v1/__init__.py
+    **Summary:** Defines the main Flask application.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it initializes the Flask application and registers the blueprints.
+    - The `app` object initializes the Flask application and sets up the configuration.
+    - The `app` object registers the blueprints, including the Report API blueprint.
+    - The `app.run` function starts the Flask application server.
+    - The `app.config` object sets up configuration options, including the database connection string.
+    - The `app.jinja_env.filters` object includes custom Jinja2 filters for formatting dates.
+
+### Response 28
+
+    ---
+    **Source:** <project_root>/api/v1/reports/<report_id>/status.py
+    **Summary:** Returns the status of a report-generation job.
+    **Implementation Guidance:**
+    - This API is directly related to the INPUT API functionality as it provides the current status of a report-generation job.
+    - The `status.py` file contains the logic for handling requests to get the status of a report.
+    - The `ReportJob` class is used to manage the report generation process and store its status.
+    - The `get_status` function retrieves the status of a specific report job using its ID.
+    - The `get_report_status` view function is responsible for handling the HTTP request and returning the status in JSON format.
+
+    ---
+    **Source:** <project_root>/api/v1/reports/<report_id>/download.py
+    **Summary:** Provides a download link for a completed report.
+    **Implementation Guidance:**
+    - This API is related to the INPUT API functionality as it provides the download link for a completed report.
+    - The `download.py` file contains the logic for handling requests to download completed reports.
+    - The `get_report_file` function retrieves the generated report file based on its ID.
+    - The `send_file` function sends the report file as a response with the appropriate Content-Disposition header to force download.
+    - The `get_report` view function is responsible for handling the HTTP request and calling the necessary functions to generate and send the report file.
+
+    ---
+    **Source:** <project_root>/api/v1/reports/<report_id>/generate.py
+    **Summary:** Starts the report-generation process and returns the job ID.
+    **Implementation Guidance:**
+    - This API is related to the INPUT API functionality as it starts the report-generation process and returns the job ID.
+    - The `generate.py` file contains the logic for handling requests to start report generation.
+    - The `generate_report` function generates the report and saves it to the file system.
+    - The `create_job` function creates a new `ReportJob` instance and saves it to the database.
+    - The `get_job_id` function generates a new job ID and returns it as a response.
+    - The `generate_report_view` function is responsible for handling the HTTP request and calling the necessary functions to start report generation and return the job ID.
+
+    ---
+    **Source:** <project_root>/api/v1/reports/<report_id>/<job_id>/progress.py
+    **Summary:** Returns the progress of a report-generation job.
+    **Implementation Guidance:**
+    - This API is related to the INPUT API functionality as it provides the progress of a report-generation job.
+    - The `progress.py` file contains the logic for handling requests to get the progress of a specific report job.
+    - The `get_progress` function retrieves the progress of a specific report job using its ID.
+    - The `get_report_progress` view function is responsible for handling the HTTP request and returning the progress in JSON format.
+
+    ---
+    **Source:** <project_root>/api/v1/reports/<report_id>/<job_id>/cancel.py
+    **Summary:** Cancels an ongoing report-generation job.
+    **Implementation Guidance:**
+    - This API is related to the INPUT API functionality as it cancels an ongoing report-generation job.
+    - The `cancel.py` file contains the logic for handling requests to cancel a specific report job.
+    - The `cancel_job` function sets the status of a specific report job to `Cancelled`.
+    - The `cancel_report_job` view function is responsible for handling the HTTP request and calling the necessary function to cancel the report job.
+
+    ---
+    **Source:** <project_root>/api/v1/reports/<report_id>/<job_id>/delete.py
+    **Summary:** Deletes a completed report-generation job and its associated file.
+    **Implementation Guidance:**
+    - This API is related to the INPUT API functionality as it deletes a completed report-generation job and its associated file.
+    - The `delete.py` file contains the logic for handling requests to delete a specific report job and its associated file.
+    - The `delete_job_and_file` function deletes the report job from the database and the associated file from the file system.
+    - The `delete_report_job` view function is responsible for handling the HTTP request and calling the necessary function to delete the report job and its associated file.
+
+### Response 29
+
+    ---
+    **Source:** <project_root>/src/api/v1/orders/discounts.js
+    **Summary:** Handles discount code validation and calculation for orders.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it handles discount code validation and calculation.
+    - The `validateDiscountCode` function checks if a discount code is valid for an order based on the code's existence in the `discountCodes` array and the order's total price being greater than or equal to the code's minimum order amount.
+    - The `calculateDiscountedTotal` function calculates the discounted total by subtracting the discount amount from the order total.
+    ---
+
+    **Source:** <project_root>/src/api/v1/orders/order.controller.js
+    **Summary:** Contains the logic for handling order-related requests.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it handles order-related requests, including the validation and calculation of discount codes.
+    - The `validateDiscountCode` function is called from the `createOrder` function when a discount code is provided in the request body.
+    - The `createOrder` function calls the `calculateDiscountedTotal` function if a valid discount code is found.
+    ---
+
+    **Source:** <project_root>/src/api/v1/discounts.js
+    **Summary:** Defines the discount codes and their associated metadata.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines the discount codes and their associated metadata, which are used in the discount code validation and calculation process.
+    - The `discountCodes` array contains objects with properties for the discount code, minimum order amount, and discount amount.
+    - The `validateDiscountCode` function in the `discounts.js` file checks if a discount code exists in the `discountCodes` array and if the order total meets the minimum order amount requirement.
+    ---
+
+    **Source:** <project_root>/src/api/v1/orders/order.model.js
+    **Summary:** Defines the schema for the order model.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines the schema for the order model, which includes the `discountCode` property that stores the applied discount code for an order.
+    - The `discountCode` property is a string type and is optional.
+    ---
+
+    ### OPTIONAL EXTERNAL APIS
+    - For this example, no relevant external APIs were found.
+
+### Response 30
+
+    ---
+    **Source:** <path/to/project>/src/api/audit-log/audit-log.ts
+    **Summary:** Handles creating and retrieving audit log entries.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it manages the creation and retrieval of audit log entries.
+    - The `createAuditLogEntry` function can be used to create a new audit log entry with the provided `eventType` and `userId`.
+    - The `getAuditLogEntries` function can be used to retrieve a list of all audit log entries.
+    ---
+
+    **Source:** <path/to/project>/src/api/audit-log/audit-log.model.ts
+    **Summary:** Defines the structure of an audit log entry.
+    **Implementation Guidance:**
+    - This code is related to the INPUT API functionality as it defines the structure of an audit log entry, which will be used when creating new entries.
+    - The `AuditLogEntry` class has properties for `eventType`, `userId`, `timestamp`, and `message`.
+    ---
+
+    **Source:** <path/to/project>/src/api/audit-log/audit-log.repository.ts
+    **Summary:** Handles persisting audit log entries to a database.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it manages the persistence of audit log entries to a database.
+    - The `create` function can be used to create a new audit log entry and save it to the database.
+    - The `findAll` function can be used to retrieve all audit log entries from the database.
+    ---
+
+    **Source:** <path/to/project>/src/api/audit-log/audit-log.service.ts
+    **Summary:** Handles the creation and retrieval of audit log entries.
+    **Implementation Guidance:**
+    - This code is directly related to the INPUT API functionality as it manages the creation and retrieval of audit log entries.
+    - The `createAuditLogEntry` function uses the `AuditLogService` to create a new audit log entry and save it to the database.
+    - The `getAuditLogEntries` function uses the `AuditLogService` to retrieve all audit log entries from the database.
+    ---
+
+    **Optional External APIs**
+
+    *None provided.*
