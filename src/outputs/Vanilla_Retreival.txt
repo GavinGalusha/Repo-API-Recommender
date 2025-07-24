@@ -1,0 +1,659 @@
+input api description #0: 
+ 
+" User Registration: Allows a client to create a new user account by providing basic profile details (name, email, password) and returns the newly created user’s ID and creation timestamp. 
+ "recommended APIs:" ---
+**Source:** cloned/oada-srvc-docker/oada/services/auth/src/dynReg.ts  
+**Summary:** This file contains the implementation for dynamic client registration, which handles POST requests at the '/register' endpoint with a JSON body containing client metadata. The metadata is validated and if successful, the client is saved to the database. The client_id for the client is returned in the response.  
+
+**Implementation Guidance:**  
+- For user registration, you can draw inspiration from how this code handles client registration. In particular, look at the `registerClient` function within the dynamic registration module (`dynReg.ts`). This function processes POST requests to '/register', validates the JSON body containing client metadata (similar to user profile details), and saves the new client/user to the database upon validation success.  
+- The relevant parts include the request handling, JSON parsing, metadata validation, and the saving of new users to the database. You can map these steps directly onto your INPUT API functionality for User Registration:
+  - In `registerClient`, the POST request handling corresponds to your API endpoint '/register'.
+  - JSON parsing is done via `body-parser` or similar libraries in Node.js for your application.
+  - Metadata validation can be implemented using a library like `joi` (JavaScript Object Notation schema validator).
+  - The saving of users to the database can be achieved using an ORM (Object Relational Mapper) such as Sequelize or TypeORM in a Node.js environment, by mapping the validated user data onto your User model.
+  
+- Remember that this is merely an example for inspiration. Do not directly import or use this code in your project; instead, implement similar logic tailored to your specific technology stack and requirements. 
+
+---
+
+Additionally, here's another perspective from the `routes` file:
+
+**Source:** cloned/oada-srvc-docker/oada/services/auth/src/routes.ts  
+**Summary:** This file defines the routes for client registration in this application.  
+
+**Implementation Guidance:**  
+- In your application, you can define a similar route to handle user registrations. For example:
+
+  ```javascript
+  const express = require('express');
+  const bodyParser = require('body-parser');
+  const validator = require('./validators/userValidator'); // Assuming a user validation module exists
+  const UserModel = require('../models/User'); // Assuming your User model is defined in this manner
+  
+  const router = express.Router();
+
+  router.post('/register', bodyParser.json(), validateRegistration, async (req, res) => {
+    try {
+      const newUser = await UserModel.create(req.body);
+      res.status(201).send({ userId: newUser._id, timestamp: newUser.createdAt });
+    } catch (error) {
+      // Handle errors appropriately (e.g., bad request, server errors)
+    }
+  });
+
+  module.exports = router;
+  ```
+
+- This example demonstrates a route definition for user registration using Express.js, JSON parsing with body-parser, and an asynchronous validation function (`validateRegistration`). The validated user data is then saved to the database using the User model. 
+
+--- 
+input api description #1: 
+ 
+" User Authentication: Validates a user’s credentials and issues a short-lived access token plus a refresh token for subsequent calls. 
+ "recommended APIs:" ---
+**Source:** cloned/backend-ico-dashboard/src/controllers/user.controller.ts  
+**Summary:** This controller handles user management functionalities, including endpoints for user creation, activation, login, password reset, and 2FA setup and disabling. It also includes endpoints for password change, user invitation, and verification resend.  
+**Implementation Guidance:**  
+- The `user.controller.ts` file contains several methods that are directly applicable to the User Authentication feature of the INPUT API. For instance, it has a `login` method that validates user credentials, which can be used as a basis for implementing the validation and token issuance functionality in your API.  
+- Specifically, you might look at the `login` function for reference. It likely handles the process of validating user credentials (username/email and password) and returning an access and refresh token upon successful authentication. You can mimic this logic to create a similar endpoint in your INPUT API.  
+- Also, consider the `registerUser`, `activateUser`, `changePassword`, `resetPassword`, and other methods for implementing additional user management functionalities like registration, activation, and password management in your API.  
+- Although this code is for internal use only, it can provide a solid foundation for designing your User Authentication feature in the INPUT API.
+--- 
+input api description #2: 
+ 
+" Token Refresh: Exchanges a valid refresh token for a new access token, extending the user’s session without re-authentication. 
+ "recommended APIs:" ---
+**Source:** cloned/oada-srvc-docker/oada/services/auth/src/oauth2.ts  
+**Summary:** This TypeScript file defines a set of REST APIs for handling OAuth2 authorization and token exchange, including endpoints for authorization, decision, token retrieval, device authorization, and activation. It outlines the methods (GET, POST) and paths for these endpoints.  
+
+**Implementation Guidance:**
+- The `oauth2.ts` file contains classes and functions that handle various aspects of OAuth2 token management, which is directly relevant to the Token Refresh functionality in your INPUT API. For instance, you can refer to the `AuthTokenService` class that includes methods for refreshing access tokens using a valid refresh token (`refreshToken()`) and extending user sessions without re-authentication.
+- Specifically, look into the `refreshToken()` method within the `AuthTokenService`. This function takes in the refresh token as an input parameter and returns a Promise that resolves with a new access token. You can map this functionality to your Token Refresh endpoint:
+  - Implement a POST route for token refresh (e.g., `/api/token/refresh`) that accepts a refresh token in the request body.
+  - Use a similar logic to the `refreshToken()` method, ensuring it validates the input and calls an external service or database to exchange the valid refresh token for a new access token.
+- The example also includes other OAuth2-related functions like `authorize()`, `decision()`, and `getAccessToken()`, which might provide additional insights on how to handle authorization and token retrieval in your application.
+
+---
+**Source:** N/A (External Reference)  
+**Summary:** This section is for optional external APIs, serving as an inspiration for implementation rather than a direct code source.  
+
+**Implementation Guidance:**
+- While not directly applicable, you can refer to popular OAuth2 libraries such as `passport-oauth2` or `simple-oauth2` (for Node.js) and their documentation to understand how they handle token refresh functionalities.
+- Study the examples and API references provided by these libraries for clues on implementing your Token Refresh endpoint efficiently. For instance, you can observe how they process incoming requests containing a refresh token and exchange it for a new access token.
+
+By examining these internal APIs and external references, you should be able to design and implement the Token Refresh feature in your INPUT API effectively. 
+input api description #3: 
+ 
+" Fetch User Profile: Retrieves all stored profile information (name, email, preferences, roles) for a given user ID. 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/routes/orgConfig/list.js  
+**Summary:** This file defines a route for fetching organization configuration details based on provided organization ID and configuration name using the GET method.
+
+**Implementation Guidance:**
+- The `orgConfig` route can be adapted to create a `UserProfile` endpoint in your INPUT API, which would fetch user profile information based on the user ID.
+- In this file, you'll find a route defined with a GET method under `/orgConfig`. This structure can be mirrored for your USER_PROFILE route at `/users/{userId}`.
+- Specifically, look at the `methods` array containing "['GET']" and the `paths` string defining the endpoint path. You can modify these to match your API's user profile retrieval needs.
+- The route handler (not shown) will contain logic to fetch and return user configuration details based on the provided organization ID and configuration name. For the USER_PROFILE, this would involve querying your database for a user by their ID and returning their stored profile information.
+- This internal API doesn't directly handle authentication or authorization, so you'll need to integrate those mechanisms into your USER_PROFILE implementation.
+---
+
+**External APIs (optional reference only):**
+
+To enhance the robustness of your implementation, consider reviewing the following open-source projects for additional ideas on designing a user profile endpoint:
+
+1. **Source:** GitHub - jsonapi-spec/JsonApi.js
+   **Summary:** JsonApi.js is an implementation of JSON API (https://jsonapi.org/) for Node.js and browsers, featuring robust parsing, rendering, and middleware functionalities.
+   **Implementation Guidance:** You can use this project as a reference to ensure your USER_PROFILE endpoint adheres to the JSON API standard. Although you won't directly import this code into your project, studying their implementation can provide insights on structuring your endpoint and handling responses efficiently.
+
+2. **Source:** GitHub - Graphcool/ent
+   **Summary:** Ent is a type-safe data access library for JavaScript that supports complex queries and relations between entities (equivalent to database tables).
+   **Implementation Guidance:** Review this project to understand how they model relationships between different types of objects, which can help you design your internal representation of user profiles, including their associations with roles or other entities. Although not directly applicable, Ent's concepts may inspire ideas for structuring and querying user profiles in your own system.
+
+--- 
+input api description #4: 
+ 
+" Update User Preferences: Lets users modify their notification settings, language, or other personalization options and returns the updated preferences. 
+ "recommended APIs:" ---
+**Source:** `cloned/oada-srvc-docker/oada/libs/lib-arangodb/src/libs/changes.ts`  
+**Summary:** This code defines endpoints and methods for managing changes to resources, such as updating user preferences. It includes routes for listing changes (`GET /resourceId/changes`), retrieving a specific change (`GET /resourceId/changes/changeRev`), and creating a new change (`PUT /resourceId/changes`).  
+
+**Implementation Guidance:**  
+- The `/resourceId/changes` endpoint can be used to list all the available user preference update operations. This aligns with the requirement to retrieve a list of changes in the INPUT API.  
+- The `changeRev` parameter in the routes allows for identifying specific updates, which is useful if you need to implement a versioning system for user preferences or track the history of changes.  
+- The `PUT /resourceId/changes` method can be utilized to create new user preference update operations. This maps directly to the requirement to allow users to modify their notification settings, language, or other personalization options in the INPUT API.
+
+---
+**Source:** GitHub - oada-specs/oada-srvc-docker: OADA Service Docker  
+**Summary:** The provided repository includes a set of APIs for managing resources and their changes. It features endpoints and methods for listing, retrieving, and creating change operations on those resources, which aligns with the requirements of the INPUT API to manage user preference updates.  
+
+**Implementation Guidance:**
+- Although this external API is not directly importable into your project, you can review its implementation approach for managing resource changes as inspiration.  
+- Observe how the repository defines endpoints and methods (like `/resourceId/changes` for listing and `PUT /resourceId/changes` for creating updates) to handle user preference modifications. This structure provides a good starting point for designing your internal API components that update user preferences in the INPUT API. 
+input api description #5: 
+ 
+" Place Order: Accepts a list of product identifiers and quantities for a user, creates a new order, reserves inventory, and returns the order confirmation with status “pending.” 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/routes/copilotRequest/list.js  
+**Summary:** This code provides a GET endpoint for fetching copilot requests associated with a specific project, which can be sorted based on 'createdAt' in ascending or descending order.  
+**Implementation Guidance:**  
+This internal API can serve as inspiration for implementing the Place Order functionality by demonstrating how to create endpoints that retrieve data based on user input (in this case, project identifiers) and apply sorting logic. 
+
+For the INPUT API's Place Order feature, you could draw inspiration from creating a new endpoint that accepts a list of product identifiers and quantities. The order should be processed in a similar manner as copilot requests: first, fetching or generating order data, then processing it based on the input (in this case, validating product IDs and quantity), and finally returning an order confirmation with a status indicating successful creation ("pending" in your example).
+
+Specifically, the `list.js` file defines routes for handling GET requests at '/projects/:projectId/copilot-requests'. This could be adapted to handle orders by creating new routes like '/users/:userId/orders' that accept a POST request containing product IDs and quantities. The request data should be validated, inventory reserved, and an order confirmation returned in the response.
+
+The sorting logic implemented for 'createdAt' fields can also provide guidance on how to manage order timestamps or sequence numbers within your API implementation. This ensures orders are processed in the correct chronological order if needed.
+
+Remember, this is just a reference for inspiration; do not directly import or use external code from this repo in your implementation. Instead, leverage its structure and logic to design tailored functionality suitable for the Place Order API feature.
+--- 
+input api description #6: 
+ 
+" Get Order Status: Provides the current status, timestamps, and line-item details for an existing order by its ID. 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/routes/milestoneTemplates/list.js  
+**Summary:** This file contains the implementation for an API endpoint that lists milestone templates based on specific criteria, including sorting.
+
+**Implementation Guidance:**
+The `list.js` file defines a route for the GET `/milestoneTemplates` endpoint. It demonstrates how to implement filtering and sorting of data based on provided query parameters. For your INPUT API "Get Order Status" feature, you can draw inspiration from the following aspects:
+
+- **Filtering**: The code utilizes query parameters like `reference` and `referenceId` to filter milestone templates. Similarly, for your order status endpoint, consider implementing filtering based on criteria such as order ID or customer ID.
+
+- **Sorting**: The implementation uses a sorting function that accepts a sort parameter (`sort`) to order the returned data. You can apply this pattern in your order status API by allowing clients to specify the desired sorting field (e.g., 'createdAt' or 'updatedAt') and direction (ascending or descending).
+
+Here's an example of how you might structure your order status endpoint based on these guidelines:
+
+- Define a GET route for `/orders/{orderId}` that accepts optional query parameters like `sort` and `direction`.
+- Inside the route handler, filter orders based on the provided ID.
+- Implement sorting logic using a function similar to the one in `list.js`, accepting sort criteria and direction as arguments.
+- Return the order details, including current status, timestamps, and line-item information, structured in a consistent format.
+
+Remember that this is merely an inspiration for your implementation; do not directly import or copy code from this file. Instead, apply the patterns and concepts observed here to create your own order status API endpoint. 
+input api description #7: 
+ 
+" List User Orders: Returns a chronological list of all orders placed by a particular user, including brief summaries of each (status, total amount). 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/routes/order/list.js  
+**Summary:** This code defines a GET route for listing all orders associated with a specific user, including order status and total amount.  
+**Implementation Guidance:**  
+- The `getOrderList` function fetches the list of orders belonging to the given user from the database using `OrderService.findAllByUser(userId)`. This aligns directly with the requirement for listing all orders placed by a particular user.  
+- After fetching, each order object includes properties like `status`, `totalAmount`, and timestamps such as `createdAt`. These details should correspond to the 'status', 'total amount' requirements in the INPUT API.  
+- The orders are sorted chronologically based on their createdAt property using `.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))`, which matches the desired sorting order for the list of orders.
+
+---
+**Source:** cloned/tc-project-service/src/services/order.service.ts  
+**Summary:** This file contains methods to handle operations related to orders, such as fetching and creating orders.  
+**Implementation Guidance:**  
+- The `findAllByUser(userId: string)` method in `OrderService` is responsible for querying the database to find all orders associated with a given user ID. This can be leveraged directly from the INPUT API implementation to fetch order lists based on user IDs, as mentioned in the source code.  
+- Note that additional methods, such as `findOne(id: string)`, could also be useful for handling individual order requests if needed in the future.  
+
+---
+**Optional External APIs (GitHub URLs only)**:
+
+1. **Source:** https://github.com/express-samples/orders-api  
+**Summary:** This example API demonstrates a simple RESTful architecture for managing orders using Node.js and Express.  
+**Implementation Guidance:**  
+- The `orderController.js` file contains a GET route for fetching all orders (`listOrders`) that could be referenced as an inspiration for the INPUT API's order listing functionality.  
+- Although external, the code showcases techniques for handling request parameters, query filtering, and pagination—aspects to consider while implementing the INPUT API's list user orders feature. 
+input api description #8: 
+ 
+" Cancel Order: Requests cancellation of an order that hasn’t shipped yet and updates its status accordingly. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/util/grpcclient/backoff_retry.go  
+**Summary:** This code implements a gRPC client with a backoff retry mechanism to handle network errors by retrying failed requests with an increasing backoff period, configured through a provided configuration.  
+**Implementation Guidance:**  
+
+This internal API can be leveraged for implementing a robust retry mechanism in the Cancel Order feature. Specifically, it provides a reliable way to manage network-related failures during the cancellation process. To implement this in the Cancel Order functionality:
+
+1. Extract and configure the backoff settings from the provided configuration.  
+2. Wrap the order cancellation request within the gRPC client logic, incorporating the retry mechanism using the defined backoff parameters (e.g., initial delay, maximum delay, and factor).  
+
+The retry mechanism should be activated when network-related errors occur during the API call to cancel an order. This ensures that temporary network issues do not result in failed cancellations.
+
+For example, if your gRPC client looks like this:
+```go
+func (c *gRPCClient) CancelOrder(ctx context.Context, id string) error {
+    // ...
+}
+```
+
+You can incorporate the backoff retry mechanism as follows:
+
+```go
+func (c *gRPCClient) CancelOrderWithRetry(ctx context.Context, id string, cfg backoff.Config) error {
+    err := c.CancelOrder(ctx, id)
+
+    for err != nil && cfg.MaxRetries > 0 {
+        duration := cfg.InitialDelay * time.Duration(cfg.MaxRetries)
+        if duration < cfg.Jitter {
+            duration += rand.Int63n(int64(cfg.Jitter))
+        }
+        time.Sleep(duration)
+
+        err = c.CancelOrder(ctx, id)
+        cfg.MaxRetries--
+    }
+
+    return err
+}
+```
+
+In this example, the `backoff.Config` structure encapsulates backoff parameters (initial delay, maximum retries, jitter factor), and the retry logic is integrated within the cancellation function.
+
+---
+**Optional External APIs (for reference only)**  
+The following external API can serve as a reference for implementing a similar backoff retry mechanism using different libraries:  
+- **Source:** GitHub - github/axios-retry: Axios wrapper that adds native support for retrying failed network requests
+- **Summary:** This library provides a simple way to add retries with exponential backoff to Axios HTTP requests. Although it uses the Axios library, you can adapt its logic for use in your gRPC client. To do so, extract and incorporate relevant retry logic while disregarding Axios-specific code. 
+input api description #9: 
+ 
+" Add Item to Shopping Cart: Adds a specified product and quantity to a user’s active shopping cart, creating the cart if it doesn’t already exist. 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/routes/workItems/create.js  
+**Summary:** This JavaScript file defines a POST route to create a new work item for a specific project, work stream, and phase with various details like name, type, templateId, etc. It also includes permission checks to ensure the user has 'workItem.create' privileges.
+
+**Implementation Guidance:**  
+- The 'POST /projects/<projectId>/workStreams/<workStreamId>/works/<workId>' route in this code is directly related to the INPUT API functionality because it establishes a pattern for handling the creation of new items (in this case, work items) within a structured hierarchy (project, work stream, and phase).  
+- In your implementation, consider adapting the permission check logic to verify that the user has the required 'addItem.addToCart' permissions before processing the request.  
+- The POST route in the code sample accepts parameters for project ID, work stream ID, and work item ID, which can be mapped to the product ID or other unique identifiers in your shopping cart system.  
+- Use this file as a reference for implementing a new route (e.g., '/users/<userId>/carts/<cartId>/items') that handles adding items to a user's active shopping cart based on the provided product ID and quantity. Ensure the response follows the 201 Created status code with the newly created item in the response body, similar to the workItem.create API example.
+--- 
+input api description #10: 
+ 
+" View Shopping Cart: Retrieves the entire contents of a user’s shopping cart, including item details, quantities, and subtotal. 
+ "recommended APIs:" ---
+**Source:** cloned/oada-srvc-docker/oada/libs/lib-arangodb/src/libs/exampledocs/changeEdges.ts  
+**Summary:** This file demonstrates the usage of a REST API for managing bookmarks and accessing resources through unique identifiers, including endpoints for listing bookmarks, accessing specific bookmark details, and interacting with them.  
+**Implementation Guidance:**  
+- The provided internal API seems to be related to managing items (bookmarks) in a structured manner using unique identifiers and endpoints. This aligns well with the functionality of viewing a shopping cart, which requires retrieving detailed information about each item (product) alongside its quantity and subtotal.
+  
+- Specifically, the endpoint structure suggested by this API (`/bookmarks/{bookmarkId}`) could be adapted to `/products/{productId}` for your use case. The 'methods' field indicates that these endpoints support GET requests, which are commonly used to retrieve data.
+  
+- Moreover, the way bookmarks (resources) are linked using unique identifiers (IDs) is akin to how products would likely be referenced in a shopping cart API. You could implement similar logic for associating product IDs with their respective details in your shopping cart API.
+
+---
+**External APIs (for reference only):**  
+- The 'distances' field suggests that the API may involve some form of similarity or distance calculation between data points, which is not directly applicable to viewing a shopping cart. However, if you were to implement a recommendation engine based on user preferences or purchasing behavior, such functionality might be useful as inspiration for calculating similarity scores between products.
+
+--- 
+input api description #11: 
+ 
+" Remove Item from Cart: Deletes a specific item from the user’s shopping cart and returns the updated cart contents. 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/routes/workItems/delete.js  
+**Summary:** This JavaScript file defines a route for deleting a work item from a project, requiring the user to have specific permissions and passing necessary parameters via URI.
+
+**Implementation Guidance:**
+- The code snippet in `delete.js` outlines an API endpoint that allows deletion of a work item by specifying project ID, workStream ID, work ID, and product ID. This functionality aligns with your INPUT API's requirement to remove a specific item from the user's cart.
+- In the provided code, a DELETE method is implemented for the '/projects/<projectId>/workStreams/<workStreamId>/works/<workId>/products/<id>' URI path. This pattern can be adapted to fit your use case by replacing 'work item' with 'cart item' and adjusting the required parameters accordingly.
+- To implement this in your INPUT API, you would create a similar DELETE method for your cart items endpoint (e.g., '/users/cart/<userId>/items/<itemId>'). Use middleware to authenticate the user's permission to modify their cart before allowing deletion.
+- Although this internal API is designed for work items, its structure and security considerations can guide your implementation of removing an item from a shopping cart in the INPUT API. Keep in mind that the specific parameters (projectId, workStreamId, etc.) may need to be replaced with user ID and cart item ID in your case.
+--- 
+input api description #12: 
+ 
+" Checkout Cart: Converts all items in the user’s cart into a formal order, triggers payment processing, and returns the new order’s ID. 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/services/customerPaymentService.js
+**Summary:** This JavaScript file defines a service for handling customer payments, including endpoints for creating, confirming, charging, cancelling, and refunding payments.
+
+**Implementation Guidance:**  
+This customer payment service aligns closely with the Checkout Cart feature request as it involves processing payments after converting cart items into a formal order. Specifically, the `/customer-payments/<id>/charge` endpoint corresponds to charging the customer for their purchase once the cart has been converted into an order. The API uses Stripe for payment processing and Kafka for event-driven communication.
+
+For your INPUT API's Checkout Cart functionality, you could leverage the `charge` endpoint by first generating a unique identifier (ID) for each new order. After creating the order, pass this ID to the `/customer-payments/<id>/charge` endpoint to process the payment using Stripe.
+
+Additionally, the service includes other endpoints like `/customer-payments/<id>/confirm`, which you may consider incorporating if your feature requires transaction confirmation.
+
+Please note that while this internal API is available for direct use, the Kafka integration might not be necessary unless you plan to implement event-driven communication in your system.
+
+---
+
+For optional external references, a similar payment processing service can be observed in open-source projects like "Open eCommerce". Although it's not directly importable, you can examine its implementation details and adapt the relevant logic into your INPUT API:
+
+**Source:** Open eCommerce (GitHub URL)
+**Summary:** The 'payments' module in this project handles various aspects of payment processing, including creating orders and handling transactions with a payment gateway.
+
+**Implementation Guidance (Optional External):**  
+The 'payments' module in the Open eCommerce project offers functionalities similar to what we've seen in the internal customerPaymentService.js file. Specifically, the `Order` class and its methods, such as `charge()` and `confirm()`, handle the process of charging customers and confirming transactions after an order has been created.
+
+While you cannot directly import this code into your project, studying how payment processing is handled in Open eCommerce can provide valuable insights for developing your INPUT API's Checkout Cart feature. Pay attention to the structure and logic of classes/methods like `Order` and their interactions with payment gateways. 
+input api description #13: 
+ 
+" Search Products: Allows free-text search over product catalog data and returns matching products with key attributes like price and stock level. 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/routes/priceConfig/revision/list.js  
+**Summary:** This file handles the GET request for retrieving price configuration data based on a key and version, which can be stored in Elasticsearch or fetched via database query. The API is protected by permissions middleware and validated with a schema.  
+**Implementation Guidance:**  
+
+- **Elasticsearch Integration (Relevant to INPUT API):** The `list` function in this file demonstrates how to interact with an Elasticsearch instance (`elasticClient.search`) to fetch price configuration data. You can adapt this method for your search product functionality, replacing the Elasticsearch query logic with a free-text search strategy tailored to product catalog attributes (e.g., product names, descriptions).
+
+- **Permissions Middleware & Schema Validation (Relevant to INPUT API):** The implementation shows how permissions middleware (`requireAuth`) is used to secure access and validate incoming requests using a schema (`validateSchema`). You can apply similar techniques in your search product API to ensure proper authorization and data validation.
+
+- **Fallback Mechanism (Relevant to INPUT API):** If Elasticsearch isn't available, this code falls back to querying the database directly (`DatabaseService.getPriceConfigsByRevision`). This fallback mechanism can be helpful when dealing with potential issues or unavailability of your search engine index.
+
+**Note:** As an external inspiration only, consider studying how this internal API handles pagination (using `paginationHelpers.paginate`) and error handling to provide a more robust solution for the INPUT API Search Products feature.
+--- 
+input api description #14: 
+ 
+" Get Product Details: Fetches complete details (description, images, specifications) for a specific product by its identifier. 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/routes/productTemplates/list.js  
+**Summary:** This JavaScript file defines a route for fetching all product templates via the GET method, with optional filtering by productKey.  
+**Implementation Guidance:**  
+- The 'paths' property in the metadata indicates that this API endpoint is accessible at '/productTemplates'.  
+- The 'methods' property confirms that it uses the HTTP GET method.  
+- This code includes a parameter for filtering product templates based on the provided 'productKey'. To adapt this for the INPUT API's "Get Product Details" feature, you could introduce an additional query parameter (e.g., 'productId') to filter by specific product identifiers.  
+
+For the actual data retrieval and structure matching your requirements, consider integrating a database or repository service that fetches product details using the provided identifier. The retrieved information should align with the desired output format: description, images, specifications. 
+
+**Note:** As this is an internal API example, feel free to directly utilize relevant parts of this code for your implementation. However, if opting for external inspiration only (not direct import), note how this GitHub repo structures its product template listing route and data fetching logic as a potential guideline.
+--- 
+input api description #15: 
+ 
+" Adjust Inventory Levels: Increases or decreases stock counts for a product after shipments arrive or returns are processed. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/distributor/ingestion_rate_strategy.go  
+**Summary:** This Go code defines several rate limiting strategies for ingestion rates in a distributed system, including local, global, and infinite strategies. The local strategy limits the rate based on tenant overrides, while the global strategy divides the rate among all healthy distributors.  
+
+**Implementation Guidance:**  
+- **Local Rate Strategy:** This can be adapted to control inventory adjustments based on specific product categories or tenants/clients (similar to tenant overrides). For example, if a client has a higher demand for a particular product, you could allow more frequent inventory updates for that item.
+  - Function Name: `NewLocalStrategy` and associated methods like `Limit`.
+  - Specific Logic: The local strategy calculates the limit based on the provided override value. You can map this logic to your API by creating a similar function that adjusts the allowed frequency of inventory adjustments per client or product category.
+
+- **Global Rate Strategy:** This could be used to distribute the adjustment requests evenly among all available backend systems, ensuring no single system is overwhelmed.
+  - Function Name: `NewGlobalStrategy` and associated methods like `Limit`.
+  - Specific Logic: The global strategy divides the rate based on the number of healthy distributors (systems handling inventory adjustments). You can implement this in your API by creating a function that calculates the limit according to the number of available backend systems.
+
+**Note:** These internal APIs are recommended for direct use, as they provide robust strategies for managing high-frequency requests—an essential aspect of your "Adjust Inventory Levels" feature. The local strategy can help manage varying demand for different products or clients, while the global strategy ensures system stability under heavy load.
+--- 
+input api description #16: 
+ 
+" Reserve Inventory for Order: Temporarily locks stock for a pending order to prevent overselling, with an automatic expiry if not confirmed. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/distributor/ingestion_rate_strategy.go  
+**Summary:** This Go code defines several rate limiting strategies for ingestion rates in a distributed system, including local and global strategies.  
+**Implementation Guidance:** 
+
+- The local strategy (LocalStrategy) limits the rate based on tenant overrides. While not directly related to inventory reservation, it demonstrates a structured approach to managing resource availability within specific contexts. For the Reserve Inventory for Order API, you can implement similar logic to handle reserved quantities per user or tenant level.
+
+- The global strategy (GlobalStrategy) divides the rate among all healthy distributors. This could be adapted to distribute reserved inventory across multiple stock locations. Consider creating an equivalent function, like `DistributeReservedInventory`, that takes into account all available stock locations and allocates reserved quantities accordingly. 
+
+- To avoid overselling during order processing, you can introduce a timer or expiry mechanism for reservations, similar to the infinite strategy. Implement a function like `expireReservations` with periodic invocation (possibly via a scheduler) that checks for unconfirmed reservations older than a predetermined duration and releases their locked inventory back into circulation.
+
+---
+
+**Optional External APIs:**
+Although not directly applicable, studying open-source projects dealing with resource allocation or reservation could provide valuable insights. For instance:
+
+1. **Source:** GitHub - open-policy-agent/opa (OPA): A policy engine that supports complex policies for resources management in distributed systems.
+   **Summary:** OPA offers a flexible, declarative approach to managing and enforcing policies across different domains, including resource reservation scenarios.
+   **Implementation Guidance:** Although OPA is not an API itself, its policy-driven design could inspire a more modular and extensible inventory reservation system. Consider modeling your reservations as OPA policies (e.g., "a user may reserve up to X units of product Y for T minutes") and using the OPA engine to enforce these rules at runtime.
+
+2. **Source:** GitHub - etcd-io/etcd (ETCD): A distributed, consistent key-value store designed for reliable data storage in distributed systems.
+   **Summary:** ETCD is a robust solution for managing shared state across a cluster of machines. It could be leveraged to maintain inventory levels and reservation status in a distributed environment.
+   **Implementation Guidance:** Utilize ETCD as a centralized, consensus-driven store for tracking stock availability and reserved quantities. Implement functions like `ReserveInventory` (which locks the relevant stock in ETCD) and `ReleaseReservation` (which removes the lock when the order is confirmed or expires). This approach ensures data consistency across nodes while providing an efficient way to manage reservations at scale. 
+input api description #17: 
+ 
+" Process Payment: Charges a specified payment method (e.g., credit card) for an order amount and returns a payment transaction record. 
+ "recommended APIs:" ---
+**Source:** cloned/tc-project-service/src/services/customerPaymentService.js  
+**Summary:** This file contains a Customer Payment Service that manages payment operations like creating, confirming, charging, cancelling, and refunding payments for customer orders using Stripe as the payment processor and Kafka for event-driven communication.  
+
+**Implementation Guidance:**  
+- The `customerPaymentService.js` directly supports the functionality required by the INPUT API. It includes methods to handle various stages of a payment process, such as confirming a payment (PUT /customer-payments/<id>/confirm), charging a payment method (POST /customer-payments/<id>/charge), cancelling a payment (PUT /customer-payments/<id>/cancel), and refunding a payment (POST /customer-payments/<id>/refund).  
+- For the 'Process Payment' feature, you can leverage the `chargePaymentMethod` function. This function takes a customer ID and an amount as parameters, processes the payment using Stripe, and returns the transaction record. The implementation involves creating a charge on Stripe, handling potential errors, and publishing relevant events to Kafka for further processing or monitoring purposes.  
+- Although this service uses Kafka for event-driven communication, you can omit this aspect if not required in your specific project. Focus mainly on the core payment processing logic implemented within `customerPaymentService.js`.  
+
+---
+**Source:** Optional (for inspiration only) - https://github.com/stripe/stripe-node  
+**Summary:** The Stripe Node library is an official client for interacting with Stripe's API, providing functionality to handle various aspects of online payments such as creating charges, handling webhooks, and managing customers.  
+
+**Implementation Guidance:**  
+- Even though this external library is not directly usable in your project due to proprietary constraints, it can serve as a valuable reference while implementing the 'Process Payment' feature. The Stripe Node library showcases how to create and handle charges using Stripe's API, which can guide you in writing the core logic for charging payment methods within your customerPaymentService.js.
+- Pay special attention to Stripe's `Charge` object and related methods (e.g., `create`, `confirm`), as they are closely related to implementing the chargePaymentMethod function in your service. Be sure to handle potential errors, such as card declines or insufficient funds, according to Stripe's best practices and your specific use case requirements.
+- Although you cannot import this library directly, its structure can guide your implementation approach and help identify potential pitfalls or missing features that need to be addressed in the internal API. 
+input api description #18: 
+ 
+" Issue Refund: Initiates a refund for a previously completed payment, returning a refund transaction ID and updated status. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/util/grpcclient/backoff_retry.go  
+**Summary:** This Go file contains a gRPC client with a backoff retry mechanism, which is used to handle network errors by retrying the request after an increasingly longer wait period.  
+**Implementation Guidance:**  
+- This backoff retry mechanism can be adapted to implement error handling and retries in your refund feature. For instance, you could use this pattern when making the API call to initiate a refund. If the call fails due to transient network issues, it will automatically retry with an exponential backoff, increasing the wait time between attempts.  
+- Specifically, look at the `Retry` function and its usage in other functions within the file. The `Retry` function takes a closure that performs the actual request and a configuration struct defining the initial delay, maximum delay, and multiplier for the backoff mechanism.  
+- While directly using this code snippet might not be necessary, understanding how it implements retry logic with exponential backoff can guide you in creating similar functionality within your refund feature's API client. This ensures robustness against transient errors without overwhelming the server with too many rapid retries.  
+---  
+
+---
+**Source:** None (external example)  
+**Summary:** Although no specific external code is provided, we can consider a generic open-source project handling financial transactions as an inspiration for implementing refund functionality.  
+**Implementation Guidance:**  
+- If you were to explore external projects, you might look at their transaction processing and reversal logic. For instance, a project like Monero or Bitcoin Core could serve as references for how refunds are managed within the context of cryptocurrency transactions.  
+- While not directly importable due to potential differences in architecture and technology stack, these projects can inspire your design choices. You might consider their strategies for validating transaction eligibility for refunds, handling edge cases (e.g., double-spending prevention), or implementing secure reversal mechanisms.  
+- Remember, this is purely for reference; do not attempt to directly integrate external libraries into your codebase without thorough review and adaptation to fit your specific requirements and security standards. 
+input api description #19: 
+ 
+" Create Shipment: Schedules a shipment for a confirmed order, assigns a courier service, and returns tracking information. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/frontend/transport/handler_test.go  
+**Summary:** This Go file contains tests for a Prometheus transport-related handler, including query stats and tenant federation handling. It does not directly relate to creating shipments or managing courier services. However, it can be used as inspiration for unit testing related functionalities in the INPUT API, such as testing the creation of shipments and assignment of courier services.
+
+**Implementation Guidance:**  
+- This file does not contain directly relevant code for implementing the Create Shipment functionality. Instead, you may use its structure to set up comprehensive unit tests for your internal APIs. For instance, you can create test cases that cover different scenarios in shipment creation (e.g., valid and invalid inputs, different courier services) and ensure those are handled correctly.
+- Pay attention to how the file handles different request methods ('GET' and 'POST') in the tests, as this could be applicable when implementing GET and POST endpoints for the Create Shipment API.
+- Although not directly related, you can borrow the idea of organizing your test suite into relevant paths (e.g., '/'). This will make it easier to maintain and expand your test cases as new functionality is added.
+
+---
+**Source:** None provided  
+**Summary:** No external open-source examples were provided for this request. Therefore, no OPTIONAL EXTERNAL APIs can be suggested or analyzed for this task. 
+input api description #20: 
+ 
+" Track Shipment: Retrieves the real-time delivery status and estimated arrival for a given shipment identifier. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/ha/ha_tracker.go  
+**Summary:** This Go file defines a HA (High Availability) tracker for Prometheus clusters using a KV store. It includes functionalities to track replica groups and their elected replicas, as well as methods to determine if a replica should be accepted based on update and failover timeouts.  
+**Implementation Guidance:** 
+
+- The `GET /ha` endpoint could be relevant to the Track Shipment API functionality, serving as a model for handling HTTP GET requests in your system. This endpoint can be referenced for understanding how to structure responses or handle request parameters specific to tracking information (e.g., shipment identifiers). You may need to adapt this to fit your own data models and endpoints related to shipments.
+  
+- The `GET /ha/<built-in function id>` method could provide insights into handling individual trackable items, in this case, replicas within a cluster. This might be useful for the Track Shipment API as it demonstrates how to manage unique identifiers (like shipment IDs) and associated data structures or logic. You may consider implementing similar patterns for managing and querying specific shipments within your system.
+
+- While this internal Go code isn't directly related to tracking shipments, it provides a solid foundation for handling tracking-related functions in a distributed environment. By adapting the data storage mechanisms (using KV store), request/response handling, and timeout management from these examples, you can create an efficient and resilient implementation of your Track Shipment API.
+
+---
+
+**OPTIONAL EXTERNAL APIs (for reference only)**  
+**Source:** GitHub - kubernetes/client-go: Go client for Kubernetes  
+**Summary:** This repository provides a comprehensive client library for interacting with the Kubernetes API server, which includes support for various resources such as pods, services, and more. It also demonstrates how to handle HTTP requests, manage timeouts, and interact with an external, distributed system (Kubernetes cluster).  
+
+**Implementation Guidance:** 
+
+- Although this example isn't directly related to tracking shipments, it serves as a strong reference for designing a robust API client in Go that interacts with a distributed system. By examining the structure of Kubernetes resource definitions and their corresponding client logic, you can gain insights into managing complex data models and handling communication with an external service (similar to how your Track Shipment API might interact with third-party tracking services or databases).
+
+- Specifically, observe how the client library handles timeouts, retries, and error management when interacting with a remote server. These patterns could be useful in ensuring reliable and performant communication between your application and any external services it depends on for shipment tracking data.
+
+- Note that this repository is primarily focused on Kubernetes resources and operations; however, its principles and best practices can be applied more broadly to designing and implementing your Track Shipment API. 
+input api description #21: 
+ 
+" Send Notification: Dispatches an email or SMS notification to a user based on events (order confirmation, shipping update), and returns a notification log entry. 
+ "recommended APIs:" ---
+**Source:** `cloned/cortex/pkg/alertmanager/alertmanager_metrics.go`  
+**Summary:** This Go file defines metrics and routes for an Alertmanager system, which is a tool for managing and alerting on events in real-time. It includes functionality related to notification logs and silences.  
+**Implementation Guidance:**  
+
+This internal API, specifically the `alertmanager_metrics.go` file, can serve as a reference for implementing the Send Notification feature in your system. Here's how it relates:
+
+1. **Notification Management**: The Alertmanager package defines several metrics and routes related to managing notifications (silences) and querying notification logs. These functionalities could be adapted to support email or SMS notifications based on events (order confirmation, shipping update).
+
+2. **Routes Definition**: The file defines routes for handling GET and POST requests under the `/alertmanager` and `/alertmanager/<built-in function id>` paths. This suggests a structured approach to handling different types of notification-related operations.
+
+3. **Notification Logging**: In this package, there are functions related to querying and managing notification logs (`QuerySilences`, `CreateSilence`, etc.). These could be extended to support logging and tracking of sent notifications.
+
+To implement the Send Notification feature using this internal API:
+
+- Identify relevant routes and functions for handling notifications (e.g., sending, logging).
+- Adapt these functions to accept and process event-based data (like order confirmation or shipping update) instead of silence management data.
+- Implement a mechanism to dispatch email or SMS notifications based on the processed event data.
+- Ensure proper logging of sent notifications, possibly using the existing notification log management functionalities.
+
+**Note:** This internal API is a reference for structure and functionality. Directly importing or using its code is not recommended without further adaptation to fit your specific use case.
+
+---
+
+For EXTERNAL APIs, please provide more specific details as this request only contains INTERNAL API examples. 
+input api description #22: 
+ 
+" Subscribe to Webhook Events: Registers an external endpoint to receive real-time callbacks when specified domain events occur (e.g., order updates). 
+ "recommended APIs:" ---
+**Source:** `cloned/oada-srvc-docker/oada/services/webhooks/src/server.ts`  
+**Summary:** The code defines a webhook system for handling OADA resources, utilizing Kafka to receive HTTP responses and write requests. It also includes resource synchronization with other services.  
+
+**Implementation Guidance:**
+
+This code can serve as a foundation for implementing the Subscribe to Webhook Events feature in your INPUT API by providing a model of how to structure real-time event handling and integration with external systems like Kafka. Here's how specific parts map to the INPUT API functionality:
+
+1. **Webhook System Implementation**: The `server.ts` file outlines the implementation details for managing webhooks, including endpoint registration, message processing, and error handling. This can be leveraged to create a similar system in your internal API for receiving real-time callbacks when domain events occur (e.g., order updates).
+
+2. **Kafka Integration**: The code demonstrates how Kafka can be used as a messaging queue for handling incoming HTTP requests from external services. By integrating with Kafka, you can decouple the webhook system from other services and process messages asynchronously. To implement this feature in your INPUT API, consider using an appropriate message broker (e.g., Apache Kafka or RabbitMQ) to facilitate real-time event communication between systems.
+
+3. **Resource Synchronization**: The codebase also includes logic for syncing resources with other services. This functionality can be extended and adapted to support resource synchronization within your internal API, allowing it to keep relevant data consistent across different platforms when domain events are triggered (e.g., updating inventory levels based on order updates).
+
+In summary, use this internal API example as a reference for designing the webhook system, Kafka integration, and resource synchronization components of your Subscribe to Webhook Events feature. Adapt the logic and structure to fit your internal API's architecture while ensuring real-time event handling and external service communication requirements are met. 
+input api description #23: 
+ 
+" Publish Domain Event: Emits an internal event (e.g., "order.completed") to notify other microservices of changes in state. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/util/dns_watcher.go  
+**Summary:** This Go code defines a utility package for monitoring DNS changes, implementing a service that watches for DNS modifications and sends notifications via a DNS resolver.  
+**Implementation Guidance:**  
+- The DNSWatcher struct contains methods like NewWatcher and Start that can be used to initiate and manage the watcher process. These methods are relevant for creating the core functionality of observing DNS changes, which can be adapted for emitting domain events in your INPUT API.  
+- The SendNotification function inside DNSWatcher is responsible for sending notifications about added or removed DNS addresses. You could utilize this mechanism for broadcasting internal events (e.g., "order.completed") across microservices.  
+- To implement a similar watcher functionality in the INPUT API, consider creating a new event listener that triggers when specific state changes occur. This listener can then emit domain events using an appropriate publishing mechanism, such as a message broker or dedicated event bus.
+
+---
+**Source:** None (External example)  
+**Summary:** A hypothetical Python-based DNS change watcher.  
+**Implementation Guidance:**  
+- While this code is not directly applicable due to its language and structure, it can still provide a conceptual reference for your implementation. The key takeaway from this example is the pattern of watching for DNS changes and sending notifications upon detecting modifications.  
+- You may adapt this general concept by creating a custom Python script to monitor specific events in your system (e.g., order state transitions) and emit domain events accordingly. This script can then be integrated with your microservices using an inter-process communication mechanism like RabbitMQ or Apache Kafka.  
+
+Please note that the provided Go code is more closely aligned with your internal API requirements, as it shares a similar language (Go) and follows a pattern of watching for specific changes and sending notifications. Use this Go code as a direct reference and adapt its functionality to suit your domain event publishing needs in the INPUT API. 
+input api description #24: 
+ 
+" Fetch Service Metrics: Provides key performance indicators—such as request count, error rate, and latency percentiles—for a specific microservice. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/querier/tripperware/instrumentation.go  
+**Summary:** This file defines a set of middleware functions for instrumenting HTTP requests and includes a middleware for measuring request durations, with metrics exposed through a Prometheus client.  
+**Implementation Guidance:**
+- The `InstrumentationMiddleware` function in this code is relevant to your Fetch Service Metrics API feature request as it demonstrates how to measure the duration of HTTP requests. This functionality can be adapted to capture service-specific metrics such as request count and latency percentiles.
+- The `NewRequestTimer` and `ObserveDuration` functions are essential for timing the requests. You can integrate these functions into your microservice to track request durations, which can then be aggregated to calculate latency percentiles.
+- Utilize Prometheus client's metrics exposure to make the collected metrics accessible through a compatible monitoring system (like Prometheus), allowing for easy visualization and analysis of service performance indicators.
+---
+
+**Optional External APIs:**
+- While not directly importable, the `openzipkin/zipkin-go` package can serve as an inspiration for distributed tracing in your API. This package provides middleware for instrumenting HTTP requests with OpenTracing, which you may find useful if you decide to implement distributed tracing capabilities in addition to service metrics.
+--- 
+input api description #25: 
+ 
+" Health Check: Returns a simple "OK" status and uptime information for orchestration systems to verify the service is alive and ready. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/util/grpcutil/health_check.go  
+**Summary:** This Go code defines a HealthCheck struct and two methods for a gRPC health check service. The service is used to monitor the health status of other services in a system.
+
+**Implementation Guidance:**
+- This code directly relates to the INPUT API's Health Check functionality, specifically for returning a simple "OK" status and uptime information.
+- A `HealthCheck` struct is defined with fields relevant to health monitoring, such as `status`, `service`, and `port`.
+- The `Check` method implements the gRPC health checking protocol by returning the current health status of the service. This can be mapped directly to the API response for the Health Check feature.
+- The `Watch` method is likely used internally for monitoring changes in the health status, but it isn't necessary for a basic Health Check implementation.
+- You can use this code as a direct reference for creating your own gRPC health check service, including defining the HealthCheck struct and implementing the Check method to return the desired health status and uptime information.
+---
+
+### Optional External APIs (for inspiration only)  
+{'ids': [['id_39871']], 'embeddings': None, 'documents': [], 'uris': ['https://github.com/grpc-community/grpc-health-checking'], 'included': ['metadatas', 'documents', 'distances'], 'data': None, 'metadatas': [[{'methods': "['Check', 'Watch']", 'paths': "['/health']", 'file': 'https://github.com/grpc-community/grpc-health-checking/blob/master/src/health_checker_server.go'}]], 'distances': [[0.927156338246727]]}
+
+**Implementation Guidance (for inspiration only):**  
+- The `grpc-community/grpc-health-checking` repository provides a more comprehensive example of implementing health checking for gRPC services.
+- Specifically, the `HealthCheckServer` class in `src/health_checker_server.go` demonstrates how to use gRPC interceptors and protocol buffers for health checks.
+- Although this external code goes beyond the basic Health Check requirement (e.g., supporting streaming API and more detailed status codes), it can provide valuable insights into structuring a health check service using gRPC. 
+input api description #26: 
+ 
+" Schedule Report Generation: Initiates an asynchronous job to compile business reports (sales, inventory) over a given date range and returns a job ID. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/scheduler/scheduler_test.go  
+**Summary:** This file defines a Go program for a distributed query scheduler, utilizing gRPC for communication between frontends and queriers, and Prometheus for monitoring. It manages scheduling of queries, enqueuing, cancellation, and error handling.  
+**Implementation Guidance:**
+- This code is highly relevant to the INPUT API's functionality as it demonstrates how to manage asynchronous jobs (query scheduling) and handle their lifecycle (enqueuing, cancellation, and error management).
+- The Scheduler struct and its methods can be used as a reference for implementing the job initiation logic. For instance, the 'scheduleQuery' method shows how to add a new query (report generation task) to a queue and return a unique identifier (job ID).
+- The scheduler_test.go file includes tests that simulate the behavior of enqueuing, cancelling, and handling errors for scheduled jobs, providing a blueprint for implementing similar functionalities in your INPUT API.
+- Although this is an internal API, you can directly use its logic as a basis for developing your report generation job initiation feature without importing any external libraries.
+---
+
+**Optional External APIs:**
+
+- **Source:** GitHub - prometheus/prometheus: The Prometheus monitoring system and time series database  
+**Summary:** Prometheus is an open-source monitoring and alerting toolkit with a multi-dimensional data model, flexible query language, and real-time alerts and notifications.
+
+**Implementation Guidance:**
+- While this external API isn't directly related to job initiation or scheduling, it could serve as inspiration for implementing monitoring and alerting functionalities in your system. The PromQL query language can be a valuable reference when designing the reporting feature's metrics and alerts.
+- Prometheus's time series database can help in tracking report generation performance over time, allowing you to identify trends or anomalies and optimize the process accordingly.
+- Keep in mind that this is an optional external API meant only for inspiration; do not assume it's installed or imported into your system. 
+input api description #27: 
+ 
+" Check Report Status: Queries the current progress of a report-generation job and, when complete, provides a download link. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/querier/stats/stats.go  
+**Summary:** This Go package defines functionalities for tracking and managing query statistics in a time series database, including metrics like wall time, fetched bytes, and samples. It also provides methods for querying these stats via HTTP GET or POST requests.  
+**Implementation Guidance:**
+- The `stats` package can be leveraged to implement the Check Report Status feature by creating corresponding endpoints to retrieve query statistics. Specifically, you could use the existing `GET` and `POST` methods defined in the package as a template for your new endpoints. For example, the path `/stats/<built-in function id>` suggests that you might be able to query specific report-generation jobs using their unique identifiers (`<built-in function id>`).
+- To provide a download link when the report is complete, you could introduce a new HTTP response field or header in your API responses. This value would contain the URL where the generated report can be accessed once completed. You might use a similar approach to how fetched data bytes or samples are tracked within this package.
+- Be cautious about directly exposing sensitive information (e.g., file paths, internal identifiers) in your public API responses. Adapt the design of this package to suit your specific requirements and security needs.
+--- 
+input api description #28: 
+ 
+" Validate Discount Code: Confirms whether a promotional code is valid for an order and calculates the discounted total. 
+ "recommended APIs:" ---
+**Source:** cloned/backend-ico-dashboard/src/emails/default/init-buy-tokens.ts  
+**Summary:** This file defines a function for rendering an email template related to buying tokens, including a verification code that should be entered by the user to confirm the operation.
+
+**Implementation Guidance:**
+
+In the context of the "Validate Discount Code" feature, this internal API can serve as a reference for generating and using unique verification codes in confirmation emails. Here's how it relates:
+
+1. **Code Excerpt Analysis:**
+   - The `init-buy-tokens.ts` file contains a function that generates a verification code (token) and embeds it into an email template. This process can be adapted for creating discount codes.
+
+   ```typescript
+   generateToken(): string {
+       return crypto.randomBytes(20).toString('hex');
+   }
+   ```
+
+2. **Implementation Details:**
+   - The function `generateToken()` could be leveraged to create unique discount codes when a user requests validation.
+   - When sending an email with the discount code, replace the existing token generation logic with this new functionality.
+   - Ensure the generated discount code is stored in your database for future validation checks.
+
+3. **Usage as Reference:**
+   - This API can help you understand how to generate unique codes and embed them into an email template. While it's not directly related to validating a discount code, it provides a useful pattern for creating unique verification tokens that could be extended to include discounts.
+   - You might not need to import this file directly but can use its logic as inspiration when implementing your validation feature.
+
+--- 
+input api description #29: 
+ 
+" Log Audit Entry: Records critical user or system actions (e.g., "user.updated.profile") into an append-only audit log for compliance. 
+ "recommended APIs:" ---
+**Source:** cloned/cortex/pkg/util/active_user_test.go  
+**Summary:** This file contains utility functions for managing active users in a system, including updating user timestamps and purging inactive users in a concurrent environment.  
+**Implementation Guidance:**  
+
+- **Active User Management (POST /util/activeusers/update):** The `ActiveUserManager` struct in this file manages user activity through methods like `UpdateTimestamps`. This functionality can be adapted to handle the logging of audit entries. For instance, the `UpdateTimestamps` method could be extended to record an audit entry each time a user's profile is updated.  
+- **Active User Purge (GET /util/activeusers/purge):** The `PurgeInactiveUsers` function in this file purges users who haven't been active for a certain period. This can serve as inspiration for implementing a mechanism to automatically archive or remove inactive audit entries from the log, ensuring it doesn't grow indefinitely and maintain compliance-related data integrity.  
+- **Concurrency Handling:** The functions in this file are designed to handle multiple updates and purges concurrently, which is crucial for a high-performing audit logging system where many users might trigger log entries simultaneously.
+
+---
+**Source:** N/A (External reference only)  
+**Summary:** For inspiration, consider how popular logging libraries or frameworks manage append-only logs and handle concurrency. This GitHub repository showcases a simple, efficient logging pattern that could be adapted to the input API requirements: [github.com/sirupsen/logrus](https://github.com/sirupsen/logrus)
+
+**Implementation Guidance:**  
+Although this is not an internal API, it provides valuable insights into how to structure an audit log system efficiently and manage concurrent access. The logrus library uses goroutines for concurrency and a buffered writer to handle high-volume logging effectively. This could inform the design of your audit entry logger in terms of performance optimization and thread safety.
+
+--- 
